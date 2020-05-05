@@ -1,41 +1,45 @@
 class DemoGameLoop {
 
-
   constructor () {
     this.states = new DemoGameLoopStates();
   }
 
-  /* mandatory methods */
   getStates() {
     return this.states;
   }
 
-  signalResourcesLoaded( loadedResources, stateName  ) {
-
-    console.log( "game/level loaded now " + stateName);
-    this.bg = loadedResources.imgArray['bg'];
-    this.ball = loadedResources.imgArray['ball'];
-
-
-  }
-
   initChapter( properties ) {
-
     this.width =  properties.w;
     this.height = properties.h;
-
     return this.states;
   }
 
-  /* stated defined methods*/
+  /* Resources */
+  signalResourcesLoaded( loadedResources, stateName  ) {
+    console.log( "game/level loaded now state:" + stateName);
+    if( stateName == 'gameLoading' ) {
+      this.bg = loadedResources.imgArray['bg'];
+      this.ball = loadedResources.imgArray['ball'];
+    }
+  }
+
   gameGetResources() {
     var pictures = [];
-    pictures['bg']= 'space2g.png';
-    pictures['ball']= "fireball.png";
+    pictures['bg']= 'example1/img/space2g.png';
+    pictures['ball']= "example1/img/fireball.png";
 
     return { resources: { imgSrcArray: pictures } }
   }
 
+  levelGetResources() {
+    var pictures = [];
+    pictures['bglevel']= 'example1/img/space2g.png';
+    pictures['balllevel']= "example1/img/fireball.png";
+
+    return { resources: { imgSrcArray: pictures } }
+  }
+
+  /* Loading game */
   gameLoadingRender( ctx ) {
     console.log("gameLoadingRender");
   }
@@ -45,19 +49,13 @@ class DemoGameLoop {
     return { endState: false };
   }
 
+  /* Init game */
   gameInit() {
     console.log("gameInit");
     this.level = 1;
   }
 
-  levelGetResources() {
-    var pictures = [];
-    pictures['bg']= 'space2g.png';
-    pictures['ball']= "fireball.png";
-
-    return { resources: { imgSrcArray: pictures } }
-  }
-
+  /* levelLoadingProcess Level */
   levelLoadingRender( ctx ) {
     console.log("LevelLoadingRender");
   }
@@ -68,6 +66,7 @@ class DemoGameLoop {
     return { endState: false };
   }
 
+  /* Init Level */
   levelInit() {
     console.log("levelInit");
     this.x = 150;
@@ -78,7 +77,7 @@ class DemoGameLoop {
     this.endFlag = false;
   }
 
-
+  /* Run Level */
   levelRunHandle( evt ) {
 
     if( evt.type == 'keyup' && evt.key == 'x') {
@@ -96,7 +95,6 @@ class DemoGameLoop {
     else if( evt.type == 'keydown' && evt.key == 'ArrowUp') {
        this.dy = -4;
     }
-
   }
 
   levelRunProcess() {
@@ -128,7 +126,6 @@ class DemoGameLoop {
       this.dy = 0;
     }
 
-
     //return NOSTATECHANGE;
     return { endState: false };
   }
@@ -150,7 +147,6 @@ class DemoGameLoop {
       this.height
     );
 
-
     context.fillStyle = "rgba("+r+","+r+","+r+",1)";
 
     for( var i=0; i<500; i++) {
@@ -170,6 +166,7 @@ class DemoGameLoop {
   }
 
 
+  /* End Level */
   levelGetEndAction() {
     this.level ++;
 
@@ -179,12 +176,12 @@ class DemoGameLoop {
     return { next: "levelGetResources" };
   }
 
+  /* Helper */
   mod( a, b) {
     var a2 = a;
     while( a2 >= b ) {
       a2 -= b;
     }
-
     return a2;
   }
 

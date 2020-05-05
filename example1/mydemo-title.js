@@ -1,14 +1,21 @@
 class DemoTitle {
 
+
   constructor () {
     this.states = new DemoTitleStates();
   }
 
-  /* mandatory methods */
   getStates() {
     return this.states;
   }
 
+  initChapter( properties ) {
+    this.width =  properties.w;
+    this.height = properties.h;
+    return this.states;
+  }
+
+  /* Resources */
   signalResourcesLoaded( loadedResources, stateName  ) {
 
     console.log( "game/level loaded now " + stateName);
@@ -20,30 +27,22 @@ class DemoTitle {
         loadedResources.imgArray['fontpurple'],
         20,20, {r:0, g:0, b:0}
       );
-
   }
 
-  initChapter( properties ) {
-
-    this.width =  properties.w;
-    this.height = properties.h;
-
-    return this.states;
-  }
-
-  /* stated defined methods*/
   titleGetResources() {
     var pictures = [];
-    pictures['bg']= 'space2g.png';
-    pictures['ball']= "fireball.png";
-    pictures['fontpurple']= "purplefont_20x20.png";
+    pictures['bg']= 'example1/img/space2g.png';
+    pictures['ball']= "example1/img/fireball.png";
+    pictures['fontpurple']= "example1/img/font/purple_medium1_20x20.png";
 
     var audio = [];
-    audio['test'] = 'laser.mp3';
+    audio['test'] = 'example1/sfx/laser.mp3';
 
     return { resources: { imgSrcArray: pictures, audioSrcArray: audio } }
   }
 
+
+  /* Loading */
   titleLoadingRender( ctx ) {
     console.log("titleLoadingRender");
   }
@@ -53,17 +52,19 @@ class DemoTitle {
     return { endState: false };
   }
 
+  /* Init */
   titleInit() {
     console.log("titleInit");
     this.endFlag = false;
     this.r = 0;
   }
 
+  /* Run */
   titleRunHandle( evt ) {
 
     if( evt.type == 'keyup' && evt.key == 'p') {
        this.audio.pause();
-       this.audio.currentTime = 0;      
+       this.audio.currentTime = 0;
        this.audio.play();
     }
     if( evt.type == 'keyup' && evt.key == 's') {
@@ -103,6 +104,7 @@ class DemoTitle {
 
   }
 
+  /* End */
   titleGetEndAction() {
     this.level ++;
     return { nextChapter: "level" };
