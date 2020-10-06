@@ -1,3 +1,0 @@
-var content = `
-Mister Doo
-`;
