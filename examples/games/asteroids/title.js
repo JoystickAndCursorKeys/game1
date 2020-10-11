@@ -45,7 +45,7 @@ class Title {
     var pictures = [];
 
     pictures['bar1']= 'res/img/pinkbar.png';
-    pictures['title']= "res/img/title.png";
+    pictures['title']= "res/img/titlepic_ship7.png";
     pictures['fontpurple']= "res/img/font/purple_medium1_20x20.png";
     pictures['fontchrome']= "res/img/font/chrome_medium1_28x35.bmp";
 
@@ -73,6 +73,13 @@ class Title {
 
       this.bar1 = loadedResources.imgArray['bar1'];
       this.title = loadedResources.imgArray['title'];
+
+      this.titlerenderW = this.title.width * 1.25;
+      this.titlerenderH = this.title.height * 1.25;
+      this.titlerenderX = (this.width - this.titlerenderW) / 2;
+      this.titlerenderY = 25;
+
+
       this.music = loadedResources.audioArray['music'];
 
       this.font = new BlockFont(
@@ -86,6 +93,8 @@ class Title {
 
       console.log("setup_Init");
       this.playSound( this.music );
+
+      this.barAngle = 0;
     }
   }
 
@@ -140,16 +149,35 @@ class Title {
     }
     this.r = r;
 
-    context.drawImage(this.title,0,0, this.width, this.height );
+    context.fillStyle = 'rgba( 48,0,48,1)';
+    context.fillRect(
+      0,
+      0,
+      this.width,
+      this.height
+    );
 
-    var str = 'Space or Z to Start';
-    var x=this.font2.centerX( str, this.width );
-    context.drawImage(this.bar1,0,480, this.width, 70 );
-    this.font2.drawString( context, x, 500 , str );
+
+
+    context.drawImage(
+            this.title,
+            this.titlerenderX, this.titlerenderY,
+            this.titlerenderW, this.titlerenderH
+          );
 
     str = 'LAST SCORE: ' + this.game.lastScore;
     x=this.font2.centerX( str, this.width );
     this.font2.drawString( context, x, 40 , str );
+
+    var barY = (Math.sin( this.barAngle ) * 250) + 250;
+    this.barAngle = this.barAngle + .05;
+
+    var str = 'Fire to Start';
+    var x=this.font2.centerX( str, this.width );
+    context.drawImage(this.bar1,0,barY, this.width, 70 );
+    this.font2.drawString( context, x, barY + 20 , str );
+
+
 
   }
 

@@ -536,8 +536,6 @@ class SpriteAnim {
 			 console.log( ex );
      }*/
   }
-
-
 }
 
 
@@ -616,6 +614,11 @@ class SpriteImage {
 		}
   }
 
+	rad(degrees)
+	{
+	  var pi = Math.PI;
+	  return degrees * (pi/180);
+	}
 
   draw( ctx, x, y, ignore, effects ) {
 		if( CollisionBoxFactory_Debug_a260592cbef84c018c6f3f4eff1037a0 ) {
@@ -623,23 +626,59 @@ class SpriteImage {
 		} else {
 
 			if( effects.active ) {
+
 				if( effects.doAlpha ) {
 					var backupAlpha = ctx.globalAlpha;
 					ctx.globalAlpha = effects.alpha;
 
+				}
+
+				var xoff = this.xoff;
+				var yoff = this.yoff;
+				var ws = this.w;
+				var hs = this.h;
+
+				if( effects.doScale ) {
+					xoff = this.xoff * effects.scale;
+					yoff = this.yoff * effects.scale;
+					ws = this.w * effects.scale;
+					hs = this.h * effects.scale;
+				}
+
+				if( true ) {
+					ctx.translate(x, y);
+					ctx.rotate(effects.rotate);
+					ctx.drawImage( this.canvas,
+							xoff ,
+							yoff ,
+						  ws,
+						  hs  );
+					ctx.rotate(-effects.rotate);
+					ctx.translate(-x, -y);
+
+				}
+				else  {
 					ctx.drawImage( this.canvas, Math.floor( x + this.xoff ) ,
 							Math.floor( y + this.yoff ) );
+				}
 
+				if( effects.doAlpha ) {
 					ctx.globalAlpha = backupAlpha;
 				}
+
+				//var s = "S(";
+				//if( effects.doAlpha ) {s = s + "a"; }
+				//if( effects.doScale ) { s = s + "s"; }
+				//if( effects.doRotate ) { s = s + "r["+effects.rotate+"]"; }
+				//s = s + ")";
+				//ctx.font = '18px serif';
+				//ctx.fillStyle = 'rgba( 255,255,255,1)';
+ 				//ctx.fillText(s, x, y);
 			}
 			else {
 				ctx.drawImage( this.canvas, Math.floor( x + this.xoff ) ,
 						Math.floor( y + this.yoff ) );
 			}
-
-
-
 		}
 	}
 
@@ -693,8 +732,6 @@ class SpriteImage {
 	}
 
 	getColissionArea( x, y ) {
-
-
 			var cb = {
 				x0: x + this.xoff,
 				x1: x + this.xoff + this.canvas.width,
@@ -828,12 +865,37 @@ class Sprite {
 
 	}
 
-	resetEffects( alphaFactor ) {
+	setScaleFactor( scaleFactor ) {
+
+		this.effects.active = true;
+		this.effects.scale = 1;
+		this.effects.doScale = true;
+		this.effects.scaleFactor = scaleFactor;
+
+	}
+
+	setRotateIncrease( rotateIncrease ) {
+
+		this.effects.active = true;
+		this.effects.rotate = 0;
+		this.effects.doRotate = true;
+		this.effects.rotateIncrease = rotateIncrease;
+
+	}
+
+
+	resetEffects() {
 
 		this.effects.active = false;
 		this.effects.alpha = 1;
-		this.effects.doAlpha = true;
-		this.effects.alphaFactor = alphaFactor;
+		this.effects.doAlpha = false;
+		this.effects.alphaFactor = 1;
+		this.effects.scale = 1;
+		this.effects.doScale = false;
+		this.effects.scaleFactor = 1;
+		this.effects.rotate = 0;
+		this.effects.doRotate = false;
+		this.effects.rotateIncrease = 0;
 
 	}
 
@@ -945,6 +1007,10 @@ class Sprite {
 	collide( this2 ) {
 
 		var this1 = this;
+
+		if( this1.effects.active || this2.effects.active ) {
+			return false;
+		}
 
 		if( this1.colliding == false || this2.colliding == false ) {
 			return false;
@@ -1160,6 +1226,15 @@ class SpriteMover {
 						if( s.effects.alpha < 0.01 || s.effects.alpha > 1 ) {
 							s.deactivate();
 						}
+					}
+					if( s.effects.doScale ) {
+						s.effects.scale = s.effects.scale * s.effects.scaleFactor;
+						if( s.effects.scale < 0.01 || s.effects.scale > 10 ) {
+							s.deactivate();
+						}
+					}
+					if( s.effects.doRotate ) {
+						s.effects.rotate = s.effects.rotate + s.effects.rotateIncrease;
 					}
 				}
 

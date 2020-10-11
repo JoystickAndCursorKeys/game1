@@ -1,10 +1,38 @@
-Examples: <br><br>
-<a href=examples/games/asteroids/index.html>Game Example - Asteroids</a><br>
-<br>
-<br>
-Source code:<br><br>
-<a href=https://github.com/JoystickAndCursorKeys/game1>Source code on GitHub</a><br>
-<br>
-<br>
-That's all for now folks!
+<html>
+<head>
+  <script src="examples.js"></script>
+</head>
+<body>
+  Examples: <br><br>
+  <div id=examples></div>
+  <script>
+	  var html = "<ul>";
+    var first = true;
+      for (const example of examples ){
+        if( example.path != null ) {
+          html = html + "<li><a href=" + example.path + "/index.html>"+example.name+"</a></li>";
+        }
+        else {
+          if( !first ) { html = html + "<br>"; }
 
+          html = html + "<b>" + example.name+"</b><br>";
+        }
+        first = false;
+      }
+	  var d = document.getElementById("examples");
+    html = html + "</ul>";
+
+	  d.innerHTML = html;
+  </script>
+  <br>
+  <br>
+  Source code:<br><br>
+  <a href=https://github.com/JoystickAndCursorKeys/game1>Source code on GitHub</a><br>
+  <br>
+  <br>
+  That's all for now folks!
+</body>
+</html>
+
+
+<!--<a href=examples/games/asteroids/index.html>Game Example - Asteroids</a><br>-->

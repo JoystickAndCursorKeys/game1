@@ -117,6 +117,12 @@ class GameLevel {
                 image: this.game.res_boom,
                 anim: null};
 
+    st['scatter'] = { type: 'explosion', health: undefined, size: undefined, colliding: false,
+                next: null,
+                bound: 'disappear',
+                image: this.game.res_scatter,
+                anim: null};
+
     st['debris'] = { type: 'debris', health: undefined, size: undefined, colliding: false,
                 next: null,
                 bound: 'disappear',
@@ -325,9 +331,9 @@ class GameLevel {
 
   }
 
-  startSceneHandle( evt ) {
+  /*startSceneHandle( evt ) {
     this.playHandle(evt);
-  }
+  }*/
 
 
   startSceneRun() {
@@ -336,7 +342,7 @@ class GameLevel {
     this.input.fire = false;
 
 
-    //this.playRunProcessor();
+    this.playRunProcessor2( false );
 
     this.nextLevelCounter--;
     if( this.nextLevelCounter > 0 ) {
@@ -370,18 +376,18 @@ class GameLevel {
 
     this.playSound( this.game.audioDestroy );
 
+
+    var xoff;
+    var yoff;
+    var dx;
+    var dy;
+
     for( var i=0; i<10; i++) {
 
-        var xoff = (Math.random() * 50)-25;
-        var yoff = (Math.random() * 50)-25;
-        var dx =  xoff / 5;
-        var dy =  yoff / 5;
-
-        /*this.addSprite( 'explosion',
-                Math.round( this.player.x+xoff ),
-                Math.round( this.player.y+yoff )
-                  ,dx,dy );
-        */
+        xoff = (Math.random() * 50)-25;
+        yoff = (Math.random() * 50)-25;
+        dx =  xoff / 5;
+        dy =  yoff / 5;
 
         var explosion =
               this.addSprite( 'explosion',
@@ -394,6 +400,20 @@ class GameLevel {
 
     }
 
+    xoff = 0;
+    yoff = 0;
+    dx =  0;
+    dy =  0;
+
+    var explosion =
+          this.addSprite( 'scatter',
+          Math.round( this.player.x+xoff ),
+          Math.round( this.player.y+yoff ) , -1, -1 );
+
+    //explosion.addXY( dx*2, dy*2);
+    explosion.setDXDY( dx, dy);
+    explosion.setFadeFactor(.97);
+    explosion.setScaleFactor(1.01);
 
   }
 
@@ -496,14 +516,18 @@ class GameLevel {
   }
 
 
-
   playRunProcessor() {
+    this.playRunProcessor2( true ) ;
+  }
+
+  playRunProcessor2( moveSprites ) {
 
     var rad = this.degrees_to_radians( this.angle * 4);
     var dx = Math.sin( rad ) * this.speed;
     var dy = Math.cos( rad ) * this.speed;
 
     var ast = this.asteroids;
+    var i;
     for (i = 0; i < ast.length; i=i+1) {
         var sprite = ast[ i ];
         var newdx = (this.player.x - sprite.x) / 100;
@@ -524,14 +548,21 @@ class GameLevel {
       this.player.setDXDY( dx, dy );
     }
 
-    this.sprites.move();
+    if( moveSprites ) {
+        this.sprites.move();
+        this.collide();
+    }
     this.sprites.animate();
+
+  }
+
+  collide() {
 
     var c = this.sprites.detectColissions();
 
     if( c.length > 0 ) {
-      //console.log( 'collide ' + c.length );
-      //console.log( c );
+      console.log( 'collide ' + c.length );
+      console.log( c );
 
       for( var i=0; i< c.length; i++ ) {
         var collision = this.sortCollistion( c[i] );
@@ -631,9 +662,9 @@ class GameLevel {
 
           this.updateLists();
       }
-      else if( a.type == 'asteroid' && b.type == 'asteroid' && false )
+      else if( a.type == 'asteroid' && b.type == 'asteroid' )
       {
-        console.log( "boom!!" + this.lastDirection);
+        console.log( "boom asteroid!!" + this.lastDirection);
 
         this.playSound( this.game.audioCollide );
 

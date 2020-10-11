@@ -56,7 +56,6 @@ class GameLoader {
     pictures[ id ]= 'res/img/anim/debris25.png';
     this.data[ id ]={ type: 'anim', w:10, h:10, bg:{r:255, g:0, b:255} };
 
-
     id = 'res_ship';
     pictures[ id ]= 'res/img/anim/ship.png';
     this.data[ id ]={ type: 'anim',  w:50, h:50, bg:{r:0, g:255, b:255} };
@@ -64,6 +63,10 @@ class GameLoader {
     id='res_boom';
     pictures[id]= 'res/img/flare-red.png';
     this.data[ id ]={ type: 'img',  bg: null };
+
+    id='res_scatter';
+    pictures[id]= 'res/img/scatterhuge.png';
+    this.data[ id ]={ type: 'img',  bg:{r:0, g:0, b:0} };
 
     id='res_laser1';
     pictures[id]= 'res/img/laser_purple.png';
