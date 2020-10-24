@@ -43,33 +43,79 @@ class Demo {
 	    this.spriteTypes = [];
 		var st = this.spriteTypes;
 
-		st['sprite'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
+		st['sprite1'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
+                next: null,
+                bound: 'bound',
+                image: this.res_sprite,
+                anim: null};
+    st['sprite2'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
                 next: null,
                 bound: 'wrap',
                 image: this.res_sprite,
                 anim: null};
 
+    st['sprite3'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
+                next: null,
+                bound: 'dissapear',
+                image: this.res_sprite,
+                anim: null};
+
+    st['sprite4'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
+                next: null,
+                bound: 'bounce',
+                image: this.res_sprite,
+                anim: null};
 
 		/* Add simple moving sprite */
 		var sprite;
 
     var x,y,dx,dy;
 
-    for (var i = 0; i < 255; i++) {
+    for (var i = 0; i < 2; i++) {
 
         x = (Math.random() * (this.width + 25))-25;
         y = (Math.random() * (this.width + 25))-25;
         dx = (Math.random() * 6)-3;
         dy = (Math.random() * 6)-3;
 
-        sprite = this.addSprite( 'sprite', x, y, dx, dy );
-
+        sprite = this.addSprite( 'sprite2', x, y, dx, dy );
+        sprite.setBoundary( 0, 0, 400, 250 );
     }
 
 
+    for (var i = 0; i < 5; i++) {
+
+        x = (Math.random() * (this.width + 25))-25;
+        y = (Math.random() * (this.width + 25))-25;
+        dx = (Math.random() * 6)-3;
+        dy = (Math.random() * 6)-3;
+
+        sprite = this.addSprite( 'sprite4', x, y, dx, dy );
+        sprite.setBoundary( 100, 350, 500, 600 );
+    }
+
+    for (var i = 0; i < 5; i++) {
+
+        x = (Math.random() * (this.width + 25))-25;
+        y = (Math.random() * (this.width + 25))-25;
+        dx = (Math.random() * 6)-3;
+        dy = (Math.random() * 6)-3;
+
+        sprite = this.addSprite( 'sprite1', x, y, dx, dy );
+        sprite.setBoundary( 600, 350, 700, 600 );
+    }
 
 
+    for (var i = 0; i < 500; i++) {
 
+        x = (Math.random() * (100))+600;
+        y = (Math.random() * (250))+0;
+        dx = (Math.random() * 6)-3;
+        dy = (Math.random() * 6)-3;
+
+        sprite = this.addSprite( 'sprite3', x, y, dx, dy );
+        sprite.setBoundary( 600, 0, 700, 250 );
+    }
 
     }
   }
@@ -137,8 +183,6 @@ class Demo {
       else if( def.bound == 'bounce' ) {
         sprite.setBoundaryActionBounce();
       }
-
-      sprite.setBoundaryActionBounce();
 
     }
 

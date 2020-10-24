@@ -3,10 +3,22 @@ class Demo {
 
   initPlayBook( properties ) {
 
-	this.loader = new DemoLoader( this );
 
-	this.width =  properties.w;
+    /* this defines the resolution of the collision box, in pixels */
+    /* lower value mean, higher granularity, the maximum granularity is '1' */
+    /* IMPORTANT: lower value means also more processing, and slower collision detection */
+
+    this.collisionResolution = {
+      xGranularity: 8,
+      yGranularity: 8
+    };
+
+
+	  this.loader = new DemoLoader( this, this.collisionResolution  );
+
+	  this.width =  properties.w;
     this.height = properties.h;
+
 
   }
 
@@ -38,39 +50,49 @@ class Demo {
   */
   play( action, data ) {
     if( action == "INIT") {
-		this.sprites = new SpriteMover();
+  		this.sprites = new SpriteMover();
 
-	    this.spriteTypes = [];
-		var st = this.spriteTypes;
+  	  /* use images for sprites */
+      var img = this.res_sprite;
+      var img2 = this.res_ball;
 
-		st['sprite'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
-                next: null,
-                bound: 'wrap',
-                image: this.res_sprite,
-                anim: null};
+      /* Add simple sprite */
+      var sprite = new Sprite( img, 0, this.height / 2  );
+      sprite.activate();
 
+      /* set direction, for movement */
+      sprite.setDXDY( 2, 3 );
 
-		/* Add simple moving sprite */
-		var sprite;
+      /* set boundary, and wrap in boundary */
+      sprite.setBoundary( -img.w, -img.h, this.width + img.w, this.height + img.h );
+      sprite.setBoundaryActionWrap();
 
-    var x,y,dx,dy;
+      /* add some data to the sprite */
+      sprite.setData( { description: "this is my first sprite"} );
 
-    for (var i = 0; i < 255; i++) {
+      sprite.setType( "sprite1" );
+      sprite.setColliding( true );
 
-        x = (Math.random() * (this.width + 25))-25;
-        y = (Math.random() * (this.width + 25))-25;
-        dx = (Math.random() * 6)-3;
-        dy = (Math.random() * 6)-3;
+      /* second sprite */
+      var sprite2 = new Sprite( img2, 0, this.height / 2  );
+      sprite2.activate();
 
-        sprite = this.addSprite( 'sprite', x, y, dx, dy );
+      /* set direction, for movement */
+      sprite2.setDXDY( 2, -3 );
 
-    }
+      /* set boundary, and wrap in boundary */
+      sprite2.setBoundary( -img2.w, -img2.h, this.width + img2.w, this.height + img2.h );
+      sprite2.setBoundaryActionWrap();
 
+      /* add some data to the sprite */
+      sprite2.setData( { description: "this is my second sprite"} );
 
+      sprite2.setType( "sprite2" );
+      sprite2.setColliding( true );
 
-
-
-
+      /* add sprites to sprite system */
+      this.sprites.addSprite( sprite  );
+      this.sprites.addSprite( sprite2 );
     }
   }
 
@@ -131,14 +153,6 @@ class Demo {
       else if( def.bound == 'disappear' ) {
         sprite.setBoundaryActionDisappear();
       }
-      else if( def.bound == 'bound' ) {
-        sprite.setBoundaryActionBound();
-      }
-      else if( def.bound == 'bounce' ) {
-        sprite.setBoundaryActionBounce();
-      }
-
-      sprite.setBoundaryActionBounce();
 
     }
 

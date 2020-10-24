@@ -108,6 +108,9 @@ class GameLoader {
   levelGetResources() {
     var pictures = [];
     pictures['bg1.level']= "res/img/bg/bg1.png";
+    pictures['bg2.level']= "res/img/bg/bg2.png";
+    pictures['bg3.level']= "res/img/bg/bg3.png";
+    pictures['bg4.level']= "res/img/bg/bg4.png";
 
     return { imgSrcArray: pictures };
   }
@@ -169,6 +172,9 @@ class GameLoader {
     }
     if( stateName == 'loadLevel' ) {
       this.level.bg1  = loadedResources.imgArray['bg1.level'];
+      this.level.bg2  = loadedResources.imgArray['bg2.level'];
+      this.level.bg3  = loadedResources.imgArray['bg3.level'];
+      this.level.bg4  = loadedResources.imgArray['bg4.level'];
 
     }
   }

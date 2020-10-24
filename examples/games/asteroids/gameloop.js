@@ -6,16 +6,6 @@ class GameLoop {
     this.lastScore = 0;
   }
 
-/*
-  getStates() {
-    return this.states;
-  }
-
-  setStates( states ) {
-    this.states = states;
-  }
-*/
-
   initPlayBook( properties ) {
     this.width =  properties.w;
     this.height = properties.h;
@@ -40,8 +30,8 @@ class GameLoop {
         loadedResources,
         data.currentState );
 
-        this.levelMax = 1;
-        this.levelCounter = 0;
+        this.level.lMax = 10;
+        this.level.lCounter = 0;
         this.score  = 0;
         this.lives = 3;
 

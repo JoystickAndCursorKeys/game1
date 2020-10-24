@@ -62,11 +62,11 @@ class StateDefinitions {
 
      var game_increaseLevel_branchFunction =
        function ( playbookObject ) {
-         if( playbookObject.levelCounter >= playbookObject.levelMex ) {
+         if( playbookObject.level.lCounter >= playbookObject.level.lMax ) {
            return 'goFinishedGame';
          }
 
-         playbookObject.levelCounter++;
+         playbookObject.level.lCounter++;
 
          return 'goNextlevel';
          };

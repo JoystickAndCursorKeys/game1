@@ -35,69 +35,80 @@ class GameLevel {
     this.spriteTypes = [];
     var st = this.spriteTypes;
 
-    st['asteroidrnd100'] = { type: 'asteroid', health: 3, size: 100, colliding: true,
+    st['asteroidrnd100'] = { type: 'asteroid', subtype1: '100', subtype2:'round', health: 3, size: 100, colliding: true,
                 next: 'asteroidrnd50',
                 score: 1,
                 bound: 'wrap',
                 image: this.game.res_rock_rnd_100,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidrnd50'] = { type: 'asteroid', health: 2, size: 50, colliding: true,
+    st['asteroidrnd50'] = { type: 'asteroid', subtype1: '50', subtype2:'round', health: 2, size: 50, colliding: true,
                 next: 'asteroidrnd25',
                 score: 2,
                 bound: 'wrap',
                 image: this.game.res_rock_rnd_50,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidrnd25'] = { type: 'asteroid', health: 1, size: 25, colliding: true,
+    st['asteroidrnd25'] = { type: 'asteroid', subtype1: '25', subtype2:'round', health: 1, size: 25, colliding: true,
                 next: null,
                 score: 4,
                 bound: 'wrap',
                 image: this.game.res_rock_rnd_25,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidblood100'] = { type: 'asteroid', health: 4, size: 100, colliding: true,
+    st['asteroidblood100'] = { type: 'asteroid', subtype1: '100', subtype2:'blood', health: 4, size: 100, colliding: true,
                 next: 'asteroidblood50',
                 score: 2,
                 bound: 'wrap',
                 image: this.game.res_rock_blood_100,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidblood50'] = { type: 'asteroid', health: 3, size: 50, colliding: true,
+    st['asteroidblood50'] = { type: 'asteroid', subtype1: '50', subtype2:'blood', health: 3, size: 50, colliding: true,
                 next: 'asteroidblood25',
                 score: 4,
                 bound: 'wrap',
                 image: this.game.res_rock_blood_50,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidblood25'] = { type: 'asteroid', health: 2, size: 25, colliding: true,
+    st['asteroidblood25'] = { type: 'asteroid', subtype1: '25', subtype2:'blood', health: 2, size: 25, colliding: true,
                 next: null,
                 score: 8,
                 bound: 'wrap',
                 image: this.game.res_rock_blood_25,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidflt100'] = { type: 'asteroid', health: 5, size: 100, colliding: true,
+    st['asteroidflt100'] = { type: 'asteroid', subtype1: '100', subtype2:'flat', health: 5, size: 100, colliding: true,
                 next: 'asteroidflt50',
                 score: 4,
                 bound: 'wrap',
                 image: this.game.res_rock_flt_100,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidflt50'] = { type: 'asteroid', health: 4, size: 50, colliding: true,
+    st['asteroidflt50'] = { type: 'asteroid', subtype1: '50', subtype2:'flat', health: 4, size: 50, colliding: true,
                 next: 'asteroidflt25',
                 score: 8,
                 bound: 'wrap',
                 image: this.game.res_rock_flt_50,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
-    st['asteroidflt25'] = { type: 'asteroid', health: 3, size: 25, colliding: true,
+    st['asteroidflt25'] = { type: 'asteroid', subtype1: '25', subtype2:'flat', health: 3, size: 25, colliding: true,
                 next: null,
                 score: 16,
                 bound: 'wrap',
                 image: this.game.res_rock_flt_25,
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
+    this.magnetic = [];
+    var roundF = .33, bloodF = .5, flatF = 1;
+    this.magnetic['round_100'] = 1  * roundF;
+    this.magnetic['round_50'] = .5  * roundF;
+    this.magnetic['round_25'] = .25 * roundF;
+    this.magnetic['blood_100'] = 1  * bloodF;
+    this.magnetic['blood_50'] = .5  * bloodF;
+    this.magnetic['blood_25'] = .25 * bloodF;
+    this.magnetic['flat_100'] = 1   * flatF;
+    this.magnetic['flat_50'] = .5   * flatF;
+    this.magnetic['flat_25'] = .25  * flatF;
 
     st['player'] = { type: 'player', health: undefined, size: undefined, colliding: true,
                 next: null,
@@ -136,7 +147,7 @@ class GameLevel {
                 anim: {play: true, speed: 1, range: [0, 34] }};
 
 
-    this.bg = new BlockImage( this.bg1 );
+    //this.bg = new BlockImage( this.bg1 );
 
     this.sprites = new SpriteMover();
 
@@ -145,7 +156,7 @@ class GameLevel {
 
     var asteroidSets = ["rnd", "flt" ,"blood", "strange"];
 
-    for( var i=0; i< (this.game.levelCounter+2); i++) {
+    for( var i=0; i< (this.lCounter+2); i++) {
       var set =  asteroidSets[ Math.round(Math.random() * 2)];
       var x = (Math.random() * (this.width + 25))-25;
       var y = (Math.random() * (this.width + 25))-25;
@@ -157,6 +168,21 @@ class GameLevel {
 
 
     this.updateLists();
+
+    var levelMod = (this.lCounter ) % 4;
+    if( levelMod == 0 ) {
+      this.bg = this.bg1;
+    }
+    else if( levelMod == 1 ) {
+      this.bg = this.bg2;
+    }
+    else if( levelMod == 2 ) {
+      this.bg = this.bg3;
+    }
+    else if( levelMod == 3 ) {
+      this.bg = this.bg4;
+    }
+
     //this.preparePlayer( );
 
   }
@@ -373,9 +399,9 @@ class GameLevel {
     this.endFlag = false;
 
     this.player.setFadeFactor(.991);
+    //this.player.setScaleFactor( .91 );
 
     this.playSound( this.game.audioDestroy );
-
 
     var xoff;
     var yoff;
@@ -520,7 +546,7 @@ class GameLevel {
     this.playRunProcessor2( true ) ;
   }
 
-  playRunProcessor2( moveSprites ) {
+  playRunProcessor2( normal ) {
 
     var rad = this.degrees_to_radians( this.angle * 4);
     var dx = Math.sin( rad ) * this.speed;
@@ -533,8 +559,24 @@ class GameLevel {
         var newdx = (this.player.x - sprite.x) / 100;
         var newdy = (this.player.y - sprite.y) / 100;
 
-        sprite.dx = .995 * sprite.dx + 0.005 * newdx;
-        sprite.dy = .995 * sprite.dy + 0.005 * newdy;
+        var mag;
+        var notMag;
+
+        if( normal )  {
+          var magKey = sprite.data.subType2 + "_" + sprite.data.subType1;
+          var magnetic = this.magnetic[ magKey ];
+          //console.log( magKey + " -> " + magnetic );
+
+          var mag = magnetic * 0.005;
+          var notMag = 1 - mag;
+        }
+        else {
+          var mag = - 0.5;
+          var notMag = 1 + mag;
+        }
+
+        sprite.dx = notMag * sprite.dx + mag * newdx;
+        sprite.dy = notMag * sprite.dy + mag * newdy;
     }
 
 
@@ -548,8 +590,10 @@ class GameLevel {
       this.player.setDXDY( dx, dy );
     }
 
-    if( moveSprites ) {
-        this.sprites.move();
+    this.sprites.move();
+
+    if( normal ) {
+
         this.collide();
     }
     this.sprites.animate();
@@ -694,9 +738,7 @@ class GameLevel {
           var dy = Math.cos( rad ) * speed;
           explosion.addXY( dx*2, dy*2);
           explosion.setDXDY( dx,dy);
-
         }
-
       }
     }
    }
@@ -744,7 +786,7 @@ class GameLevel {
 
   render( context ) {
 
-    context.drawImage(this.bg1,0,0, this.width, this.height);
+    context.drawImage(this.bg,0,0, this.width, this.height);
 
     var str, x;
     str = 'SCORE: ' + this.game.score;
@@ -752,7 +794,7 @@ class GameLevel {
     this.game.res_font2.drawString( context, x, 10 , str );
 
 
-    str = 'LEVEL: ' + this.game.levelCounter + "    LIVES: " + this.game.lives;
+    str = 'LEVEL: ' + this.lCounter + "    LIVES: " + this.game.lives;
     x=this.game.res_font2.centerX( str, this.width );
     this.game.res_font2.drawString( context, x, 35 , str );
 
@@ -775,7 +817,10 @@ class GameLevel {
       animSpeed = def.anim.speed;
     }
 
-    sprite.setData( { animSpeed:animSpeed ,  health: def.health, size: def.size, next: def.next , score: def.score } );
+    sprite.setData( {
+        animSpeed:animSpeed ,  health: def.health, size: def.size, next: def.next , score: def.score,
+        subType1: def.subtype1, subType2: def.subtype2
+      } );
 
     this.sprites.addSprite( sprite );
 

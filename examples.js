@@ -32,6 +32,13 @@ examples.push(
 
 examples.push(
 	{
+		name: "Sprites Boundary Demo",
+		path: "examples/demos/sprites_boundary"
+	}
+);
+
+examples.push(
+	{
 		name: "Animated Sprites Demo",
 		path: "examples/demos/sprites_animation"
 	}
@@ -41,6 +48,13 @@ examples.push(
 	{
 		name: "Input Controlled Sprites Demo",
 		path: "examples/demos/sprites_input"
+	}
+);
+
+examples.push(
+	{
+		name: "Sprites Collision Demo",
+		path: "examples/demos/sprites_collision"
 	}
 );
 

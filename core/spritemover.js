@@ -770,8 +770,10 @@ class Sprite {
 		this.dbgCol = 0;
 
 		this.boundaryAction = {
-				bound: false,
-				dissapear: true
+			bound: false,
+			bounce: false,
+			dissapear: true,
+			wrap: false
 		}
     this.active = false;
 
@@ -910,6 +912,16 @@ class Sprite {
 	setBoundaryActionBound() {
 		this.boundaryAction = {
 				bound: true,
+				bounce: false,
+				dissapear: false,
+				wrap: false
+		}
+  }
+
+	setBoundaryActionBounce() {
+		this.boundaryAction = {
+				bound: false,
+				bounce: true,
 				dissapear: false,
 				wrap: false
 		}
@@ -918,6 +930,7 @@ class Sprite {
 	setBoundaryActionDisappear() {
 		this.boundaryAction = {
 				bound: false,
+				bounce: false,
 				dissapear: true,
 				wrap: false
 		}
@@ -926,6 +939,7 @@ class Sprite {
 	setBoundaryActionWrap() {
 		this.boundaryAction = {
 				bound: false,
+				bounce: false,
 				dissapear: false,
 				wrap: true
 		}
@@ -939,6 +953,24 @@ class Sprite {
     if( s.x > bound.x1 ) { s.x = bound.x0; }
     if( s.y < bound.y0 ) { s.y = bound.y1;  }
     if( s.y > bound.y1 ) { s.y = bound.y0;  }
+	}
+
+
+	bounceInBoundary() {
+
+		var s = this;
+		var bound = s.boundary;
+
+		var crossedX = false, crossedY = false;
+		if( s.x < bound.x0 ) { crossedX = true; }
+    if( s.x > bound.x1 ) { crossedX = true; }
+    if( s.y < bound.y0 ) { crossedY = true;  }
+    if( s.y > bound.y1 ) { crossedY = true;  }
+
+		this.placeInBoundary();
+
+		if( crossedX ) { this.dx = - this.dx; }
+		if( crossedY ) { this.dy = - this.dy; }
 	}
 
 	placeInBoundary() {
@@ -1204,6 +1236,9 @@ class SpriteMover {
 					}
 					else if ( b.bound ) {
 						s.placeInBoundary();
+					}
+					else if ( b.bounce ) {
+						s.bounceInBoundary();
 					}
 					else if ( b.wrap ) {
 						s.wrapInBoundary();
