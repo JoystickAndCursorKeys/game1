@@ -5,16 +5,6 @@ class Title {
     this.game = game;
   }
 
-/*
-  getStates() {
-    return this.states;
-  }
-
-  setStates( states ) {
-    this.states = states;
-  }
-*/
-
   initPlayBook( properties ) {
     this.width =  properties.w;
     this.height = properties.h;
@@ -22,11 +12,7 @@ class Title {
   }
 
 
-
-
   /* Resources */
-
-
 
   /* Loading */
   setupBGRender( ctx ) {
@@ -45,7 +31,7 @@ class Title {
     var pictures = [];
 
     pictures['bar1']= 'res/img/pinkbar.png';
-    pictures['title']= "res/img/titlepic_ship7.png";
+    pictures['title']= "res/img/title0.png";
     pictures['fontpurple']= "res/img/font/purple_medium1_20x20.png";
     pictures['fontchrome']= "res/img/font/chrome_medium1_28x35.bmp";
 

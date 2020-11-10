@@ -33,7 +33,6 @@ class GameState {
           else if( existingFlag == 'BRANCH' )     { type.BRA    = true;  }
       }
 
-
       var errorMessage = undefined;
       if( type.LOD && type.INI ) {
           var errorMessage = "state type " + typeId + " cannot have INIT flag when LOAD flag is set" ;
@@ -298,46 +297,7 @@ class GameState {
           throw "unknown exitEvent '"+ stateChange +"' in state ("+this.stateId+")";
       }
       this.gotoState( this.state[ stateChange ] );
-
-
-      //this.stateClass[ this.methodInit ]();
-
     }
-
-/*
-    type.LOD    = false;
-    type.INI    = false;
-    type.CLE    = false; //latest
-    type.REN    = false;
-    type.PRO    = false;
-    type.INP    = false;
-    type.BRA    = false;
-
-
-    else if( this.state._type == "PLAY" ) {
-
-      this.methodRender       = stateId + this.defaultSuffix.multiEventSignal;
-      this.methodProcess      = stateId + this.defaultSuffix.multiEventSignal;
-      this.methodEvents       = stateId + this.defaultSuffix.multiEventSignal;
-      this.methodInit         = stateId + this.defaultSuffix.multiEventSignal;
-
-      this.bookClass[ this.methodInit ]();
-
-    }
-    else if( this.state._type == "CALC" ) {
-
-      var exitEvent = this.state._calculateFunction( this.bookClass );
-      var newState = this.state[ exitEvent ];
-
-      console.log( "Exit Event = " + exitEvent  );
-      console.log( this.stateId + "._calculateFunction('" + this.bookClass.constructor.name + "') => " + newState );
-
-      this.gotoState( newState );
-      return;
-    }
-
-*/
-
   }
 
   loadResources( resources ) {
@@ -345,12 +305,14 @@ class GameState {
     var myClass = this.stateClass;
 
     var myArray, myDestArray, myState;
-    var imgState, audioState;
+    var imgState, audioState, dataState;
     imgState = { count:0 };
     audioState = { count:0 };
+    dataState = { count:0 };
 
     imgState.load = false;
     audioState.load = false;
+    dataState.load = false;
 
     if( resources == undefined ) {
       this.gotoState( this.state.next );
@@ -379,9 +341,19 @@ class GameState {
       }
     }
 
+    myArray = resources.dataSrcArray;
+    myState = dataState;
+    if( myArray  != undefined ) {
+      myState.keys = Object.keys( myArray );
+      myState.urls = myArray;
+      myState.count = myState.keys.length;
+      if( myState.count > 0 ) {
+        myState.load = true;
+      }
+    }
 
     this.loadedCount = 0;
-    this.loadingCount = imgState.count + audioState.count;
+    this.loadingCount = imgState.count + audioState.count + dataState.count;
 
     if( this.loadingCount == 0 ) {
       this.gotoState( this.state.next );
@@ -391,6 +363,7 @@ class GameState {
     var loadedResources = {};
     loadedResources.imgArray = [];
     loadedResources.audioArray = [];
+    loadedResources.dataArray = [];
 
     myArray = resources.imgSrcArray;
     myDestArray = loadedResources.imgArray;
@@ -420,12 +393,23 @@ class GameState {
   	}
 
 
-    //this.gotoState( this.state.next );
+    myArray = resources.dataSrcArray;
+    myDestArray = loadedResources.dataArray;
+    myState = dataState;
+    for( var i=0; i<myState.count; i++ )  {
+      var key = myState.keys[i];
+      var url = myArray[ key ];
+
+      myDestArray[ key ] = new Object();
+      myDestArray[ key ].data = null;
+      myDestArray[ key ].url = url;
+  	}
+
     var __this = this;
     var urls, count, res, keys;
-    var srcArrays = [ resources.imgSrcArray, resources.audioSrcArray  ];
-    var dstArrays = [ loadedResources.imgArray, loadedResources.audioArray ];
-    var states = [ imgState, audioState ];
+    var srcArrays = [ resources.imgSrcArray, resources.audioSrcArray, resources.dataSrcArray ];
+    var dstArrays = [ loadedResources.imgArray, loadedResources.audioArray, loadedResources.dataArray ];
+    var states = [ imgState, audioState, dataState ];
 
     for( var h=0; h<srcArrays.length; h++ )  {
 
@@ -439,7 +423,7 @@ class GameState {
       for( var i=0; i<myState.count; i++ )  {
         var key = myState.keys[i];
         var url = myState.urls[ key ];
-
+        var browserResource = false;
         console.log(key + ":" + url + " " + i);
         res = myDestArray[ key ];
 
@@ -447,21 +431,61 @@ class GameState {
           res.onload = function ( evt ) {
             __this.onLoadedResource( evt, myClass, loadedResources );
           }
+
+          browserResource = true;
         }
-        else /*audio*/
+        else if( h==1 ) /*audio*/
         {
           res.onloadeddata = function ( evt ) {
             __this.onLoadedResource( evt,  myClass, loadedResources );
           }
 
+          browserResource = true;
+        }
+        else /*data*/
+        {
+
+          browserResource = false;
+          this.fetchData( url, res, myClass, loadedResources  );
+
         }
 
-        res.onerror = function ( evt ) {
-          alert("Could not find resource " + res.src );
+        if( browserResource ) {
+          res.onerror = function ( evt ) {
+            alert( "Could not find resource " + evt.target.src );
+          }
+          res.src = url;
         }
-        res.src = url;
 
     	}
+    }
+  }
+
+  fetchData( url, res, myClass, loadedResources  ) {
+
+    var __this = this;
+
+    if( url.endsWith( ".json" ) ) {
+      fetch( url )
+        .then(response => response.json())
+        .then((data) => {
+          var evt = { currentTarget: { id: 'jsondata.'+url } };
+          console.log(data)
+          res.data = data;
+
+          __this.onLoadedResource( evt,  myClass, loadedResources );
+        })
+    }
+    else {
+      fetch( url )
+        .then(response => response.text())
+        .then((data) => {
+          var evt = { currentTarget: { id: 'txtdata.'+url } };
+          console.log(data)
+          res.data = data;
+
+          __this.onLoadedResource( evt,  myClass, loadedResources );
+        })
     }
   }
 
@@ -577,6 +601,54 @@ class GameState {
   }
 }
 
+class DefaultStateDefinitions {
+
+  constructor ( classObject ) {
+
+    this.startPlaybook = "basic";
+
+    /* -----------------------------------------------------
+      Playbooks
+       ----------------------------------------------------- */
+
+    this.playbooks = {
+        basic: { object: classObject, enter: 'load', definition: this },
+    };
+
+    /* -----------------------------------------------------
+      Global state setup
+       ----------------------------------------------------- */
+
+    this.stateTypes = {
+      LOADSILENT:   ['LOAD'],
+      PLAY:         ['INIT','CLEANUP','RENDER','PROCESS','HANDLEINPUT'],
+      WATCH:        ['INIT','CLEANUP','RENDER','PROCESS'],
+      INIT:         ['INIT'],
+      BRANCH:       ['BRANCH']
+    };
+
+    this.stateMethodSuffix = {
+      LSRENDER:     undefined,
+      LSPROCESS:    undefined,
+      RENDER:       'Render',
+      PROCESS:      'Run',
+      HANDLEINPUT:  'Handle'
+    };
+
+
+	  /* basic playbook */
+    var playbook = this.playbooks.basic;
+    playbook.states = {
+
+		/* Only load, play and repeat since this is a demo, not a game */
+
+        'load':    { _type: "LOADSILENT",  next: 'play'},
+        'play':    { _type: "PLAY", next: 'play' },
+
+      } ;
+  }
+}
+
 
 class Boot {
 	constructor ( _renderCanvasId, _SCRW, _SCRH, stateDefinitions ) {
@@ -616,7 +688,25 @@ class Boot {
           _SCRH
         );
 
-        this.state = new GameState ( stateDefinitions, this.properties );
+
+
+        if( Array.isArray( stateDefinitions ) ) {
+            var errorString = "new Boot( ..., ..., ..., stateDefinitions ), stateDefinitions must be either and object or an array of [ runClassObject, 'basic' ]";
+            if( stateDefinitions.length != 2 ) {
+              throw errorString;
+            }
+            else {
+              if( stateDefinitions[ 1 ] != 'basic' ) {
+                throw errorString;
+              }
+            }
+
+            var stateDef = new DefaultStateDefinitions( stateDefinitions[ 0 ] );
+            this.state = new GameState ( stateDef, this.properties );
+        }
+        else {
+            this.state = new GameState ( stateDefinitions, this.properties );
+        }
 
         var __this = this;
 

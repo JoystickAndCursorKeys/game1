@@ -41,11 +41,9 @@
 
 
 	<script src="../../../core/boot.js"></script>
-	<script src="../../../core/blockimage.js"></script>
 	<script src="../../../core/blockfont.js"></script>
 	<script src="../../../core/spritemover.js"></script>
-	<script src="./statedefinitions.js"></script>		
-	<script src="./loader.js"></script>	
+	<script src="./loader.js"></script>
 	<script src="./demo.js"></script>
 
 
@@ -89,7 +87,8 @@
 		SCR_W = MIN_SCR_W;
 		SCR_H = MIN_SCR_H;
 
-		game = new Boot( 'screenCanvas', SCR_W, SCR_H, stateDefinitions );
+		var demo = new Demo();
+		var program = new Boot( 'screenCanvas', SCR_W, SCR_H, [ demo, 'basic' ] );
 
 	}
 

@@ -504,7 +504,7 @@ class SpriteAnim {
 
   draw( ctx, x, y, frame, effects ) {
 
-		//try {
+		try {
 
 			if( CollisionBoxFactory_Debug_a260592cbef84c018c6f3f4eff1037a0 ) {
 				this.drawDebug( ctx, x, y, frame );
@@ -529,12 +529,12 @@ class SpriteAnim {
 
 			}
 
-     /*}
+     }
      catch ( ex ) {
        throw "Could not draw image " + frame + " : "+ ex;
 			 console.log(this);
 			 console.log( ex );
-     }*/
+     }
   }
 }
 
@@ -604,7 +604,7 @@ class SpriteImage {
 
 			this.context.putImageData( imgdata, 0, 0);
 		}
-		if (typeof collissionBoxSettings !== 'undefined') {
+		if (typeof collissionBoxSettings !== 'undefined' ) {
 
 			this.imagesCanvasCollision =
 					new CollisionBoxFactory( this.canvas,
@@ -773,7 +773,8 @@ class Sprite {
 			bound: false,
 			bounce: false,
 			dissapear: true,
-			wrap: false
+			wrap: false,
+			event: false
 		}
     this.active = false;
 
@@ -829,6 +830,9 @@ class Sprite {
 		this.data = d;
 	}
 
+	getData() {
+		return( this.data );
+	}
 
 	setCycleFrameRate( r ) {
 		this.frameFlipSpeed = r;
@@ -914,7 +918,8 @@ class Sprite {
 				bound: true,
 				bounce: false,
 				dissapear: false,
-				wrap: false
+				wrap: false,
+				event: false
 		}
   }
 
@@ -923,7 +928,8 @@ class Sprite {
 				bound: false,
 				bounce: true,
 				dissapear: false,
-				wrap: false
+				wrap: false,
+				event: false
 		}
   }
 
@@ -932,7 +938,8 @@ class Sprite {
 				bound: false,
 				bounce: false,
 				dissapear: true,
-				wrap: false
+				wrap: false,
+				event: false
 		}
 	}
 
@@ -941,7 +948,19 @@ class Sprite {
 				bound: false,
 				bounce: false,
 				dissapear: false,
-				wrap: true
+				wrap: true,
+				event: false
+		}
+	}
+
+	setBoundaryActionEvent( handler ) {
+		this.boundaryAction = {
+				bound: false,
+				bounce: false,
+				dissapear: false,
+				wrap: false,
+				event: true,
+				eventHandler: handler
 		}
 	}
 
@@ -1009,6 +1028,10 @@ class Sprite {
     this.x = x;
     this.y = y;
   }
+
+	getXY( ) {
+		return [ this.x, this.y ];
+	}
 
 	addXY( x, y ) {
     this.x += x;
@@ -1242,6 +1265,9 @@ class SpriteMover {
 					}
 					else if ( b.wrap ) {
 						s.wrapInBoundary();
+					}
+					else if ( b.event ) {
+						b.eventHandler[0][ b.eventHandler[1] ]( s );
 					}
         }
       }

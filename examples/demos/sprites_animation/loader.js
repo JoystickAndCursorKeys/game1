@@ -31,8 +31,6 @@ class DemoLoader {
     var rd;
 
     for (const id in imgarr) {
-        console.log(`imgArray::${id}: ${imgarr[id]}`);
-
 
         pic = imgarr[ id ];
         rd = this.data[ id ];
@@ -40,24 +38,13 @@ class DemoLoader {
         if( rd.type == 'anim' ) {
 
           this.main[id] = new SpriteAnim( pic , rd.w, rd.h, rd.bg,
-              this.collisBoxRes
+              undefined
             );
         }
         else if( rd.type == 'img' ) {
 
           this.main[id]   = new SpriteImage( pic , rd.bg,
-              this.collisBoxRes );
-        }
-        else if( rd.type == 'font' ) {
-
-          this.main[id]   = new BlockFont(
-              pic,
-              rd.w, rd.h, rd.bg
-            );
-        }
-        else if( rd.type == 'raw' ) {
-
-          this.main[id]   = pic;
+              undefined );
         }
     }
   }

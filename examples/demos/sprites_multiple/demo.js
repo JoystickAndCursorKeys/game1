@@ -157,8 +157,4 @@ class Demo {
 
     return sprite;
   }
-
 }
-
-var demo = new Demo();
-var stateDefinitions = new StateDefinitions( demo );

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BoulderBash</title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+	<link rel="icon" href="res/img/icon/browsericon.png">
+	<style>
+		.outer {
+		  display: table;
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  height: 100%;
+		  width: 100%;
+
+		}
+
+		.middle {
+		  display: table-cell;
+		  vertical-align: middle;
+		}
+
+		.inner {
+		  margin-left: auto;
+		  margin-right: auto;
+		  text-align: center;
+		}
+		.screenCanvas {
+  		margin-left: auto;
+  		margin-right: auto;
+
+  		outline: none;
+  		-webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+  		cursor:crosshair;
+
+			/*transform: scale(1.5);*/
+			display: none;
+		}
+
+		/*.screenCanvas:hover {
+  		transform: scale(1.5);
+		}*/
+
+
+		.startButtonImage {
+			margin-left: auto;
+  		margin-right: auto;
+
+  		outline: none;
+  		-webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+  		cursor:crosshair;
+
+			display: none;
+		}
+
+	</style>
+
+
+	<script src="../../../core/boot.js"></script>
+	<script src="../../../core/blockfont.js"></script>
+	<script src="../../../core/tiles.js"></script>
+	<script src="../../../core/spritemover.js"></script>
+	<script src="./title.js"></script>
+	<script src="./gameloader.js"></script>
+	<script src="./gamelevel.js"></script>
+	<script src="./gameloop.js"></script>
+	<script src="./statedefinitions.js"></script>
+	<script src="./init.js"></script>
+
+
+<script>
+
+	var dmCMU = null;
+	var booter = null;
+	var SCR_H = null;
+	var SCR_H = null;
+	var MIN_SCR_W = 1024;
+	var MIN_SCR_H = 600;
+
+	window.onload = function() {
+		//start();
+
+		var startbutton = document.getElementById("startButton");
+
+		if( window.location.hostname == "localhost" ) {
+			startbutton.style.display = "none";
+			start();
+		}
+		else {
+			startbutton.style.display = "block";
+		}
+	}
+
+	function start() {
+
+		var startbutton = document.getElementById("startButton");
+		startbutton.style.display = "none";
+
+		var sc = document.getElementById("screenCanvas");
+		sc.style.display = "block";
+		sc.focus();
+
+		var container = document.getElementById("middlediv");
+
+		console.log( document.fullscreenElement );
+
+		var doc = document;
+
+
+		var WIN_W = 640;
+		var WIN_H = 480;
+
+		var MAGNIFY, MAGNIFYX, MAGNIFYY;
+
+		var AVAILABLEW;
+		var AVAILABLEH;
+
+		if( window.innerHeight != window.screen.height ) {
+
+				AVAILABLEW = ( container.clientWidth - 16 );
+				AVAILABLEH = ( container.clientHeight - 16 );
+
+		}
+		else {
+			AVAILABLEW = ( container.clientWidth  );
+			AVAILABLEH = ( container.clientHeight );
+		}
+
+		MAGNIFYX = ( AVAILABLEW ) / WIN_W;
+		MAGNIFYY = ( AVAILABLEH ) / WIN_H;
+
+		if( MAGNIFYX * WIN_H > AVAILABLEH ) {
+			MAGNIFY = MAGNIFYY;
+		}
+		else {
+			MAGNIFY = MAGNIFYX;
+		}
+
+		sc.style.transform = "scale(" + MAGNIFY + ")";
+
+		game = new Boot( 'screenCanvas', WIN_W, WIN_H, stateDefinitions );
+
+	}
+
+</script>
+
+
+</head>
+<body bgcolor=#300030>
+
+<div class="outer" id="outerdiv" display="none">
+  <div id="middlediv" class="middle">
+    <div id="innerdiv" class="inner">
+		<canvas class='screenCanvas' id="screenCanvas" width="100%" height="100%" tabindex='1'></canvas>
+		<img class="startButtonImage" src="res/img/title0.png" onclick="start()" id="startButton">
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>

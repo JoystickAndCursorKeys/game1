@@ -145,6 +145,3 @@ class Demo {
   }
 
 }
-
-var demo = new Demo();
-var stateDefinitions = new StateDefinitions( demo );

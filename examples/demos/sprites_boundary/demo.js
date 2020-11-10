@@ -56,7 +56,7 @@ class Demo {
 
     st['sprite3'] = { type: 'sprite', health: undefined, size: undefined, colliding: false,
                 next: null,
-                bound: 'dissapear',
+                bound: 'event',
                 image: this.res_sprite,
                 anim: null};
 
@@ -174,8 +174,8 @@ class Demo {
       if( def.bound == 'wrap' ) {
         sprite.setBoundaryActionWrap();
       }
-      else if( def.bound == 'disappear' ) {
-        sprite.setBoundaryActionDisappear();
+      else if( def.bound == 'event' ) {
+        sprite.setBoundaryActionEvent( [ this, 'handleSpriteBoundaryEvent' ] );
       }
       else if( def.bound == 'bound' ) {
         sprite.setBoundaryActionBound();
@@ -202,7 +202,10 @@ class Demo {
     return sprite;
   }
 
-}
+  handleSpriteBoundaryEvent( sprite ) {
+    console.log( "sprite out of boundary event, sprite: ");
+    console.log( sprite );
+    sprite.deactivate();
+  }
 
-var demo = new Demo();
-var stateDefinitions = new StateDefinitions( demo );
+}
