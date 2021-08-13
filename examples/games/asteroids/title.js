@@ -36,7 +36,7 @@ class Title {
     pictures['fontchrome']= "res/img/font/chrome_medium1_28x35.bmp";
 
     var audio = [];
-    audio['music'] = 'res/msx/echos.mp3';
+    audio['music'] = 'res/msx/POL-gunman-short.mp3';
 
     return  { imgSrcArray: pictures, audioSrcArray: audio } ;
 
