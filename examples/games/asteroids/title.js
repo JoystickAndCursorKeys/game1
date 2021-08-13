@@ -34,9 +34,10 @@ class Title {
     pictures['title']= "res/img/title0.png";
     pictures['fontpurple']= "res/img/font/purple_medium1_20x20.png";
     pictures['fontchrome']= "res/img/font/chrome_medium1_28x35.bmp";
+    pictures['fontsmall']= 'res/img/font/neon1_small_15x15.png';
 
     var audio = [];
-    audio['music'] = 'res/msx/echos.mp3';
+    audio['music'] = 'res/msx/POL-gunman-short.mp3';
 
     return  { imgSrcArray: pictures, audioSrcArray: audio } ;
 
@@ -75,6 +76,10 @@ class Title {
       this.font2 = new BlockFont(
             loadedResources.imgArray['fontchrome'],
             28,35, {r:0, g:0, b:0}
+          );
+      this.font3 = new BlockFont(
+            loadedResources.imgArray['fontsmall'],
+             15, 15, {r:0, g:0, b:0}
           );
 
       console.log("setup_Init");
@@ -154,6 +159,17 @@ class Title {
     str = 'LAST SCORE: ' + this.game.lastScore;
     x=this.font2.centerX( str, this.width );
     this.font2.drawString( context, x, 40 , str );
+
+    //Background music from PlayOnLoop.com
+    //Licensed under Creative Commons by Attribution 4.0
+
+    str = 'MUSIC FROM PLAYONLOOP.COM';
+    x=this.font3.centerX( str, this.width );
+    this.font3.drawString( context, x, 540 , str );
+
+    str = 'LICENSED UNDER CREATIVE COMMONS BY ATTRIBUTION 4.0';
+    x=this.font3.centerX( str, this.width );
+    this.font3.drawString( context, x, 560 , str );
 
     var barY = (Math.sin( this.barAngle ) * 250) + 250;
     this.barAngle = this.barAngle + .05;
