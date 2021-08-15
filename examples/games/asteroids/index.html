@@ -74,11 +74,11 @@
 	var MIN_SCR_H = 600;
 
 	window.onload = function() {
-		//start();
 
 		var startbutton = document.getElementById("startButton");
 
-		if( window.location.hostname == "localhost" ) {
+		//for debugging purposes allow auto start on localhost
+		if( false && window.location.hostname == "localhost" ) {
 			startbutton.style.display = "none";
 			start();
 		}

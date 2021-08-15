@@ -83,7 +83,7 @@ class Title {
           );
 
       console.log("setup_Init");
-      this.playSound( this.music );
+      this.playMusic( this.music );
 
       this.barAngle = 0;
     }
@@ -183,13 +183,15 @@ class Title {
 
   }
 
-  playSound( snd ) {
+  playMusic( snd ) {
     snd.pause();
     snd.currentTime = 0;
     try {
+      snd.loop = true;
       snd.play();
     }
     catch(err) {
+      console.log(snd);
       console.log(err);
     }
   }

@@ -403,7 +403,7 @@ class SpriteAnim {
 							}
 						}
 						else {
-							if( transCol.mode == 'lightness' ) {
+							if( transCol.mode == 'ness' ) {
 									dd[ offset + 3] = transCol.factor * ( ( dd[ offset + 0] + dd[ offset + 1] + dd[ offset + 2] ) / 3);
 							}
 
@@ -562,7 +562,6 @@ class SpriteImage {
 
 		if( transCol != null ) {
 
-
 			var imgdata = this.context.getImageData(0, 0, w, h);
 			var dd  = imgdata.data;
 			var rowoffset = w * 4;
@@ -571,7 +570,6 @@ class SpriteImage {
 			var xoffset = 0;
 			var yoffset = 0;
 			var offset;
-
 
 			for (var y = 0; y < h; y++) {
 				yoffset = y * rowoffset;
@@ -625,13 +623,25 @@ class SpriteImage {
 			this.drawDebug( ctx, x, y, ignore );
 		} else {
 
+
+			var backupGlobalCompositeOperation = null;
+
+			if( effects.doCompositeOperation ) {
+				backupGlobalCompositeOperation = ctx.globalCompositeOperation;
+				ctx.globalCompositeOperation = effects.compositeOperation;
+			}
+
 			if( effects.active ) {
 
-				if( effects.doAlpha ) {
-					var backupAlpha = ctx.globalAlpha;
-					ctx.globalAlpha = effects.alpha;
+				var backupAlpha = null;
 
+
+				if( effects.doAlpha ) {
+					backupAlpha = ctx.globalAlpha;
+					ctx.globalAlpha = effects.alpha;
 				}
+
+
 
 				var xoff = this.xoff;
 				var yoff = this.yoff;
@@ -678,6 +688,10 @@ class SpriteImage {
 			else {
 				ctx.drawImage( this.canvas, Math.floor( x + this.xoff ) ,
 						Math.floor( y + this.yoff ) );
+			}
+
+			if( backupGlobalCompositeOperation != null ) {
+				ctx.globalCompositeOperation = backupGlobalCompositeOperation;
 			}
 		}
 	}
@@ -788,12 +802,15 @@ class Sprite {
   }
 
   draw( context ) {
+
+		//context.globalCompositeOperation = "lighter";
     this.spriteImage.draw( context,
 				Math.round( this.x ),
 				Math.round( this.y ),
 				this.frameIndex,
 				this.effects
 			);
+		//context.globalCompositeOperation = "source-over";
   }
 
 
@@ -860,6 +877,21 @@ class Sprite {
 
 	playAnim() {
 		this.pauseAnimFlag = false;
+	}
+
+	setCompositeOperation( op ) {
+
+		//this.effects.active = true;
+		this.effects.compositeOperation = op;
+		this.effects.doCompositeOperation = true;
+
+	}
+
+	setTimer( time ) {
+
+		this.onTimer = true;
+		this.timer = time;
+
 	}
 
 	setFadeFactor( alphaFactor ) {
@@ -1201,6 +1233,7 @@ class SpriteMover {
 
       if( found == -1 ) {
         this.sprites.push( s );
+				console.log("sprite count: " + this.sprites.length );
       }
       else {
         this.sprites[ found ] = s;
@@ -1251,6 +1284,13 @@ class SpriteMover {
       if( s.active ) {
         s.x += s.dx;
         s.y += s.dy;
+
+				if( s.onTimer ) {
+					s.timer--;
+					if(s.timer<=0) {
+						s.active = false;
+					}
+				}
 
         if( !s.inBoundary() ) {
 					var b = s.getBoundaryAction();
