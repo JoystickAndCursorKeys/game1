@@ -72,6 +72,10 @@ class GameLoader {
     pictures[id]= 'res/img/laser_purple.png';
     this.data[ id ]={ type: 'img',  bg: { mode: 'lightness', factor: 3 } };
 
+    id='res_thrust';
+    pictures[id]= 'res/img/blink3.png';
+    this.data[ id ]={ type: 'img',  bg: { mode: 'lightness', factor: 1 } };
+
     id='res_font1';
     pictures[id]= 'res/img/font/sunset_medium1_36x45.png';
     this.data[ id ]= { type: 'font',  w:36, h:45, bg: {r:0, g:0, b:0} };

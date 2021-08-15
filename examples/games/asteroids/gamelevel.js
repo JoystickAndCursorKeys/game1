@@ -122,6 +122,12 @@ class GameLevel {
                 image: this.game.res_laser1,
                 anim: null};
 
+    st['thrust'] = { type: 'debris', health: undefined, size: undefined, colliding: false,
+                next: null,
+                bound: 'disappear',
+                image: this.game.res_thrust,
+                anim: null};
+
     st['explosion'] = { type: 'explosion', health: undefined, size: undefined, colliding: false,
                 next: null,
                 bound: 'disappear',
@@ -281,6 +287,24 @@ class GameLevel {
       if( this.speed > 8) {
         this.speed = 8;
       }
+
+      var exhaust =
+            this.addSprite( 'thrust',
+            Math.round( this.player.x ),
+            Math.round( this.player.y ) , -1, -1 );
+
+
+      exhaust.setFadeFactor(.8);
+      exhaust.setScaleFactor(1.01);
+      exhaust.setCompositeOperation("lighten");
+      exhaust.setTimer( 20 );
+
+      var rad = this.degrees_to_radians( ((this.angle) * 4 ) + 180);
+      var dx = Math.sin( rad ) * 10;
+      var dy = Math.cos( rad ) * 10;
+      exhaust.addXY( dx*4, dy*4);
+      exhaust.setDXDY( ((Math.random() * 50)-25)/10 ,((Math.random() * 50)-25)/10);
+
     }
     else if( input.down ) {
       this.speed *= 0.8;
@@ -300,6 +324,7 @@ class GameLevel {
       var dy = Math.cos( rad ) * 10;
       bullet.addXY( dx*5, dy*5);
       bullet.setDXDY( dx,dy);
+      bullet.setCompositeOperation("lighten");
 
       this.playSound( this.game.audioLaser );
 
@@ -626,10 +651,12 @@ class GameLevel {
 
             if( a.data.size == 100 ) {
               var asteroid = this.addSprite( a.data.next , a.x, a.y, 1, 1 );
+              var asteroid = this.addSprite( a.data.next , a.x, a.y, -1, 1 );
             }
             else if( a.data.size == 50 ) {
               var asteroid = this.addSprite( a.data.next , a.x+5, a.y, 1, 1 );
               var asteroid = this.addSprite( a.data.next , a.x-5, a.y, -1, 1 );
+              var asteroid = this.addSprite( a.data.next , a.x-5, a.y, 1, -1 );
             }
             else if( a.data.size == 25 ) {
               var object = this.addSprite( "coin" , a.x, a.y, 1, 1 );
@@ -649,7 +676,9 @@ class GameLevel {
             var dy = Math.cos( rad ) * 1;
             explosion.addXY( dx*2, dy*2);
             explosion.setDXDY( dx,dy);
-            explosion.setFadeFactor(.9);
+            explosion.setFadeFactor(.94);
+            explosion.setScaleFactor(1.03);
+            explosion.setCompositeOperation("lighten");
 
             this.playSound( this.game.audioDestroy );
           }
