@@ -655,7 +655,7 @@ class SpriteImage {
 					hs = this.h * effects.scale;
 				}
 
-				if( true ) {
+				if( effects.doRotate || effects.doScale ) {
 					ctx.translate(x, y);
 					ctx.rotate(effects.rotate);
 					ctx.drawImage( this.canvas,
@@ -758,6 +758,9 @@ class SpriteImage {
 			return cb;
 	}
 
+	getCanvas() {
+		return this.canvas;
+	}
 
 }
 
@@ -878,6 +881,20 @@ class Sprite {
 	playAnim() {
 		this.pauseAnimFlag = false;
 	}
+
+
+	linkPos( parent, xoff, yoff ) {
+		this.linked = true;
+		this.linkParent = parent;
+		this.linkOffsetX = xoff;
+		this.linkOffsetY = yoff;
+	}
+
+	linkAnim( parent ) {
+		this.linkedAnim = true;
+		this.linkAnimParent = parent;
+	}
+
 
 	setCompositeOperation( op ) {
 
@@ -1086,6 +1103,10 @@ class Sprite {
     this.dy = dy;
   }
 
+	getDXDY( ) {
+		return [ this.dx, this.dy ];
+	}
+
 	decreaseSpeed( factor ) {
 		this.dx  = this.dx * factor;
 		this.dy  = this.dy * factor;
@@ -1206,6 +1227,21 @@ class SpriteMover {
 		return count;
   }
 
+
+	getLinkedSprites( parent ) {
+		var list = [];
+		for( var i=0; i<this.sprites.length; i++ ) {
+				if( this.sprites[ i ].active && this.sprites[ i ].linked == true) {
+
+					if( this.sprites[ i ].linkParent == parent ) {
+						list.push( this.sprites[ i ] );
+				}
+			}
+		}
+		return list;
+	}
+
+
 	getSprites( type ) {
 		var list = [];
 		for( var i=0; i<this.sprites.length; i++ ) {
@@ -1277,13 +1313,23 @@ class SpriteMover {
 		return colissions;
 	}
 
+
+
+
   move() {
     for( var i=0; i<this.sprites.length; i++ ) {
       var s = this.sprites[ i ];
 
       if( s.active ) {
-        s.x += s.dx;
-        s.y += s.dy;
+
+				if(s.linked) {
+						s.x = s.linkParent.x + s.linkOffsetX;
+						s.y = s.linkParent.y + s.linkOffsetY;
+				}
+				else {
+					s.x += s.dx;
+					s.y += s.dy;
+				}
 
 				if( s.onTimer ) {
 					s.timer--;
@@ -1318,7 +1364,11 @@ class SpriteMover {
 		for( var i=0; i<this.sprites.length; i++ ) {
 			var s = this.sprites[ i ];
 			if( s.active ) {
-				if( !s.pauseAnimFlag ) {
+
+				if( s.linkedAnim ) {
+					s.frameIndex = s.linkAnimParent.frameIndex;
+				}
+				else if( !s.pauseAnimFlag ) {
 					s.cycleFrame();
 				}
 				if( s.effects.active ) {
