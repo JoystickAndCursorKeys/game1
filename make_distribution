@@ -1,0 +1,7 @@
+DISTR=../game1-distribution
+
+rm $DISTR/game1-core.zip
+zip $DISTR/game1-core.zip ./core/*
+
+rm $DISTR/game1-examples.zip
+zip $DISTR/game1-examples.zip ./core/*
