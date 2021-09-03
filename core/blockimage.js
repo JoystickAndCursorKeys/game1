@@ -48,6 +48,7 @@ class BlockImage  {
 
 	}
 
+
   reInit() {
     if( this.source != undefined ) {
       this.initFromImage( this.source );
@@ -68,6 +69,14 @@ class BlockImage  {
 
 	getCopyAllData() {
 		return this.context.getImageData(0, 0, this.w, this.h);
+	}
+
+	getContext() {
+		return this.context;
+	}
+
+	getCanvas() {
+		return this.canvas;
 	}
 
 	setAllData( data ) {
@@ -144,7 +153,7 @@ class BlockImage  {
 
 	}
 
-	changeSaturation( level ) {
+	mask( tR,tG,tB ) {
 
 				var imgCtxCanv = this;
 				var tmpImgCtxCanv = imgCtxCanv.copy( );
@@ -159,8 +168,6 @@ class BlockImage  {
 				var yoffset = 0;
 				var yoffsetmin = 0;
 				var rowSize = w*4;
-
-				var colorBox = new ColorBox();
 
 				for( var y=0; y<h; y++ ) {
 
@@ -177,67 +184,14 @@ class BlockImage  {
 						g = srcData[ offset + 1];
 						b = srcData[ offset + 2];
 
-						var hsv = colorBox.RGBtoHSV( r, g, b );
-						hsv.s = level;
+						dstData[ offset + 0]=r;
+						dstData[ offset + 1]=g;
+						dstData[ offset + 2]=b;
+						dstData[ offset + 3]=255;
 
-						var rgb = colorBox.HSVtoRGB( hsv.h, hsv.s, hsv.v );
-
-						dstData[ offset + 0]=rgb.r;
-						dstData[ offset + 1]=rgb.g;
-						dstData[ offset + 2]=rgb.b;
-
-					}
-
-					yoffset+= ( rowSize );
-				}
-
-				imgCtxCanv.setAllData( dstIData );
-
-	}
-
-	changeHue( degrees ) {
-
-				var imgCtxCanv = this;
-				var tmpImgCtxCanv = imgCtxCanv.copy( );
-
-				var w=tmpImgCtxCanv.w;
-				var h=tmpImgCtxCanv.h;
-				var srcIData = tmpImgCtxCanv.getCopyAllData();
-				var dstIData = imgCtxCanv.getCopyAllData();
-				var srcData = srcIData.data;
-				var dstData = dstIData.data;
-
-				var yoffset = 0;
-				var yoffsetmin = 0;
-				var rowSize = w*4;
-
-				var colorBox = new ColorBox();
-
-				for( var y=0; y<h; y++ ) {
-
-					for( var x=0; x<w; x++) {
-
-						var offset = yoffset + (x * 4);
-
-						if( srcData[ offset + 3] == 0) {
-							continue;
+						if( r==tR && g==tG && b==tB) {
+							dstData[ offset + 3]=0;
 						}
-
-						var r,g,b;
-						r = srcData[ offset + 0];
-						g = srcData[ offset + 1];
-						b = srcData[ offset + 2];
-
-						var hsv = colorBox.RGBtoHSV( r, g, b );
-						hsv.h = degrees;
-						hsv.s = 1;
-
-						var rgb = colorBox.HSVtoRGB( hsv.h, hsv.s, hsv.v );
-
-						dstData[ offset + 0]=rgb.r;
-						dstData[ offset + 1]=rgb.g;
-						dstData[ offset + 2]=rgb.b;
-
 					}
 
 					yoffset+= ( rowSize );
@@ -246,7 +200,6 @@ class BlockImage  {
 				imgCtxCanv.setAllData( dstIData );
 
 	}
-
 
 	rotate90Degrees() {
 
