@@ -1,13 +1,42 @@
 <html>
+<head>
+<title>Convert images to image strip</title>
+<style>
+
+.infobox {
+
+
+	background-color: #aaaaff;
+
+	display: block;
+
+	width: 500px;
+	height: 40px;
+}
+
+.checker {
+	background-color: #FFF;
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+  background-image: linear-gradient(45deg, #888 25%, transparent 25%, transparent 75%, #888 75%, #888),
+                    linear-gradient(45deg, #888 25%, transparent 25%, transparent 75%, #888 75%, #888);
+}
+</style>
+</head>
 <body>
 
-Convert Images to Image Strip<br/><br/>
+<font size=6>Convert Images to Image Strip</font><br/><br/>
+
+Info:<br>
+<div class="infobox" id=myinfobox>No info yet!</div><br>
+<br><br>
 <label>Image File(s):</label>
 <input type="file" id="imageLoader" name="imageLoader" multiple/>
 
 <br/><br/>
-<table bgcolor=gray border=1><tr><td bgcolor=#aaaaff>
-<canvas id="imageCanvas" style=" background-color: rgba(0,0,0,0);"></canvas>
+<table  border=1 width=500 height=500 CELLPADDING=0 CELLSPACING=0 >
+<tr><td class="checker" valign=top>
+<canvas id="imageCanvas" ></canvas>
 </td></tr></table>
 <br/><br/>
 <a id="downloadlink" href="">Click here to Download Image</a>
@@ -20,18 +49,29 @@ Convert Images to Image Strip<br/><br/>
 	var dlLink = document.getElementById('downloadlink');
 	dlLink.addEventListener('click', function(ev) {
 		dlLink.href = canvas.toDataURL();
-		dlLink.download = "sprites.png";
+		dlLink.download = "imagestrip.png";
 	}, false);
 
 
 	var imageLoader = document.getElementById('imageLoader');
 		imageLoader.addEventListener('change', handleUpload, false);
-	
+
 
 	var images_read=0;
 	var images_read2=0;
 	var image_strip_width = 0;
 	var image_strip_height = 0;
+	var img_w;
+	var img_h;
+
+
+
+	function removeAllChildNodes(parent) {
+	    while (parent.firstChild) {
+	        parent.removeChild(parent.firstChild);
+	    }
+	}
+
 	function handleUpload(e){
 		var reader = new FileReader();
 		reader.onload = function(event){
@@ -42,52 +82,67 @@ Convert Images to Image Strip<br/><br/>
 					canvas.height = img.height;
 					image_strip_width = img.width * e.target.files.length;
 					image_strip_height = img.height;
+
+					img_w = img.width;
+					img_h = img.height;
+
+					var linebreak = document.createElement("br");
+					var newtext;
+
+					var myinfobox = document.getElementById('myinfobox');
+					removeAllChildNodes( myinfobox );
+					newtext = document.createTextNode( "Width: " + img_w + ", Height: " + img_h );
+					myinfobox.appendChild(newtext);
+					myinfobox.appendChild(linebreak);
+					newtext = document.createTextNode( "Strip Width: " + image_strip_width + ", Strip Height: " + image_strip_height );
+					myinfobox.appendChild(newtext);
+
 				}
 				ctx.drawImage(img,img.width * images_read,0);
-				
+
 				if( (images_read + 1) < e.target.files.length ) {
-					reader.readAsDataURL(e.target.files[ images_read + 1 ]); 
+					reader.readAsDataURL(e.target.files[ images_read + 1 ]);
 					images_read ++;
+
+
 				}
-				else {	
+				else {
 					images_read2 = images_read;
 					images_read = 0;
-					
+
 					var imgd = ctx.getImageData(0, 0, image_strip_width, image_strip_height);
 					pix = imgd.data;
 					r0=pix[0];
 					g0=pix[1];
 					b0=pix[2];
-					
-					
-					for (var i = 0; i <pix.length; i += 4) {
-					
-						var r = pix[i],
-							g = pix[i+1],
-							b = pix[i+2];
 
-						if( r == r0 && g == g0 && b == b0){ 
-							//pix[i + 0] = 22;
-							//pix[i + 1] = 55;
-							//pix[i + 2] = 33;
+
+					for (var i = 0; i <pix.length; i += 4) {
+
+						var r,g,b;
+						r = pix[i],
+						g = pix[i+1],
+						b = pix[i+2];
+
+						if( r == r0 && g == g0 && b == b0){
 							pix[i + 3] = 0;
 						}
 					}
-					
-					ctx.putImageData( imgd, 0, 0 ); 
-					
-				}
-				
 
-	
+					ctx.putImageData( imgd, 0, 0 );
+
+				}
+
+
+
 			}
 			img.src = event.target.result;
-	
+
 		}
-		
-		
-		reader.readAsDataURL(e.target.files[0]);   
-		  
+
+
+		reader.readAsDataURL(e.target.files[0]);
+
 	}
 </script>
 
