@@ -1,0 +1,95 @@
+<html>
+<body>
+
+Convert Images to Image Strip<br/><br/>
+<label>Image File(s):</label>
+<input type="file" id="imageLoader" name="imageLoader" multiple/>
+
+<br/><br/>
+<table bgcolor=gray border=1><tr><td bgcolor=#aaaaff>
+<canvas id="imageCanvas" style=" background-color: rgba(0,0,0,0);"></canvas>
+</td></tr></table>
+<br/><br/>
+<a id="downloadlink" href="">Click here to Download Image</a>
+
+<script>
+
+	var canvas = document.getElementById('imageCanvas');
+	var ctx = canvas.getContext('2d');
+
+	var dlLink = document.getElementById('downloadlink');
+	dlLink.addEventListener('click', function(ev) {
+		dlLink.href = canvas.toDataURL();
+		dlLink.download = "sprites.png";
+	}, false);
+
+
+	var imageLoader = document.getElementById('imageLoader');
+		imageLoader.addEventListener('change', handleUpload, false);
+	
+
+	var images_read=0;
+	var images_read2=0;
+	var image_strip_width = 0;
+	var image_strip_height = 0;
+	function handleUpload(e){
+		var reader = new FileReader();
+		reader.onload = function(event){
+			var img = new Image();
+			img.onload = function(){
+				if( images_read == 0 ) {
+					canvas.width = img.width * e.target.files.length;
+					canvas.height = img.height;
+					image_strip_width = img.width * e.target.files.length;
+					image_strip_height = img.height;
+				}
+				ctx.drawImage(img,img.width * images_read,0);
+				
+				if( (images_read + 1) < e.target.files.length ) {
+					reader.readAsDataURL(e.target.files[ images_read + 1 ]); 
+					images_read ++;
+				}
+				else {	
+					images_read2 = images_read;
+					images_read = 0;
+					
+					var imgd = ctx.getImageData(0, 0, image_strip_width, image_strip_height);
+					pix = imgd.data;
+					r0=pix[0];
+					g0=pix[1];
+					b0=pix[2];
+					
+					
+					for (var i = 0; i <pix.length; i += 4) {
+					
+						var r = pix[i],
+							g = pix[i+1],
+							b = pix[i+2];
+
+						if( r == r0 && g == g0 && b == b0){ 
+							//pix[i + 0] = 22;
+							//pix[i + 1] = 55;
+							//pix[i + 2] = 33;
+							pix[i + 3] = 0;
+						}
+					}
+					
+					ctx.putImageData( imgd, 0, 0 ); 
+					
+				}
+				
+
+	
+			}
+			img.src = event.target.result;
+	
+		}
+		
+		
+		reader.readAsDataURL(e.target.files[0]);   
+		  
+	}
+</script>
+
+</body>
+</html>
