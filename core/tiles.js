@@ -132,12 +132,14 @@ class Tiles {
 						dd[ offset + 2] = sd[ offset + 2];
 						dd[ offset + 3] = sd[ offset + 3];
 
-						if( dd[ offset + 0] == transCol.r && dd[ offset + 1] == transCol.g && dd[ offset + 2] == transCol.b )
-						{
-							dd[ offset + 0] = 0;
-							dd[ offset + 1] = 0;
-							dd[ offset + 2] = 0;
-							dd[ offset + 3] = 0; /* Make transparent */
+						if( transCol ) {
+							if( dd[ offset + 0] == transCol.r && dd[ offset + 1] == transCol.g && dd[ offset + 2] == transCol.b )
+							{
+								dd[ offset + 0] = 0;
+								dd[ offset + 1] = 0;
+								dd[ offset + 2] = 0;
+								dd[ offset + 3] = 0; /* Make transparent */
+							}
 						}
 
 						xoffset += 4;

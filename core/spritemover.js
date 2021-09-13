@@ -538,10 +538,8 @@ class SpriteAnim {
   }
 }
 
-
-
 class SpriteImage {
-  constructor( img, transCol, collissionBoxSettings ) {
+  constructor( img, postLoadOperation, collissionBoxSettings ) {
     this.img = img;
     this.xoff = - img.width / 2;
     this.yoff = - img.height / 2;
@@ -560,47 +558,76 @@ class SpriteImage {
 
 		this.context.drawImage( this.img, 0, 0, w, h);
 
-		if( transCol != null ) {
+//Array.isArray(
+		if( postLoadOperation != null ) {
+			if( typeof postLoadOperation === 'object'
+					&& !Array.isArray(postLoadOperation) ) {
 
-			var imgdata = this.context.getImageData(0, 0, w, h);
-			var dd  = imgdata.data;
-			var rowoffset = w * 4;
-			var sx = x;
+				var transCol = postLoadOperation;
 
-			var xoffset = 0;
-			var yoffset = 0;
-			var offset;
+				var imgdata = this.context.getImageData(0, 0, w, h);
+				var dd  = imgdata.data;
+				var rowoffset = w * 4;
+				var sx = x;
 
-			for (var y = 0; y < h; y++) {
-				yoffset = y * rowoffset;
-				xoffset = 0;
-				for (var x = 0; x < w; x++) {
-					offset = yoffset + xoffset;
+				var xoffset = 0;
+				var yoffset = 0;
+				var offset;
 
-					if( transCol.mode == undefined ) {
-						if( dd[ offset + 0] == transCol.r && dd[ offset + 1] == transCol.g && dd[ offset + 2] == transCol.b )
-						{
-							dd[ offset + 0] = 0;
-							dd[ offset + 1] = 0;
-							dd[ offset + 2] = 0;
-							dd[ offset + 3] = 0; /* Make transparent */
+				for (var y = 0; y < h; y++) {
+					yoffset = y * rowoffset;
+					xoffset = 0;
+					for (var x = 0; x < w; x++) {
+						offset = yoffset + xoffset;
+
+						if( transCol.mode == undefined ) {
+							if( dd[ offset + 0] == transCol.r && dd[ offset + 1] == transCol.g && dd[ offset + 2] == transCol.b )
+							{
+								dd[ offset + 0] = 0;
+								dd[ offset + 1] = 0;
+								dd[ offset + 2] = 0;
+								dd[ offset + 3] = 0; /* Make transparent */
+							}
 						}
-					}
-					else {
-						if( transCol.mode == 'lightness' ) {
-								dd[ offset + 3] = transCol.factor * ( ( dd[ offset + 0] + dd[ offset + 1] + dd[ offset + 2] ) / 3);
+						else {
+							if( transCol.mode == 'lightness' ) {
+									dd[ offset + 3] = transCol.factor * ( ( dd[ offset + 0] + dd[ offset + 1] + dd[ offset + 2] ) / 3);
+							}
 						}
-
+						xoffset += 4;
 					}
-
-					xoffset += 4;
+					yoffset += rowoffset;
 				}
 
-				yoffset += rowoffset;
+				this.context.putImageData( imgdata, 0, 0);
 			}
+			else { //array
 
+					var canvas2 = document.createElement('canvas');
+					var context2 = canvas2.getContext('2d');
+					canvas2.width = this.canvas.width;
+					canvas2.height = this.canvas.height;
 
-			this.context.putImageData( imgdata, 0, 0);
+					//var imgdata = this.context.getImageData(0, 0, w, h);
+
+					for (var i = 0; i < postLoadOperation.length; i++) {
+							var op = postLoadOperation[ i ];
+							op.f( this.context,
+										context2,
+										op.par);
+
+							this.canvas = canvas2;
+							this.context = context2;
+							w= this.canvas.width;
+							h= this.canvas.height;
+
+							this.xoff = - w / 2;
+					    this.yoff = - h / 2;
+
+					}
+
+					//this.context.putImageData( imgdata, 0, 0);
+			}
 		}
 		if (typeof collissionBoxSettings !== 'undefined' ) {
 
@@ -611,12 +638,6 @@ class SpriteImage {
 					).getBoxes();
 		}
   }
-
-	rad(degrees)
-	{
-	  var pi = Math.PI;
-	  return degrees * (pi/180);
-	}
 
   draw( ctx, x, y, ignore, effects ) {
 		if( CollisionBoxFactory_Debug_a260592cbef84c018c6f3f4eff1037a0 ) {
@@ -675,15 +696,6 @@ class SpriteImage {
 				if( effects.doAlpha ) {
 					ctx.globalAlpha = backupAlpha;
 				}
-
-				//var s = "S(";
-				//if( effects.doAlpha ) {s = s + "a"; }
-				//if( effects.doScale ) { s = s + "s"; }
-				//if( effects.doRotate ) { s = s + "r["+effects.rotate+"]"; }
-				//s = s + ")";
-				//ctx.font = '18px serif';
-				//ctx.fillStyle = 'rgba( 255,255,255,1)';
- 				//ctx.fillText(s, x, y);
 			}
 			else {
 				ctx.drawImage( this.canvas, Math.floor( x + this.xoff ) ,
@@ -817,7 +829,6 @@ class Sprite {
   }
 
 
-
   activate() {
     this.active = true;
   }
@@ -882,6 +893,33 @@ class Sprite {
 		this.pauseAnimFlag = false;
 	}
 
+
+	setLinkXoYo( xoff, yoff ) {
+		this.linkOffsetX = xoff;
+		this.linkOffsetY = yoff;
+	}
+
+	setLinkXoYo( xoff, yoff ) {
+		this.linkOffsetX = xoff;
+		this.linkOffsetY = yoff;
+	}
+
+	getLinkXoYo() {
+		return [this.linkOffsetX, this.linkOffsetY];
+	}
+
+	factorLinkXoYo( f ) {
+		this.linkOffsetX *= f;
+		this.linkOffsetY *= f;
+	}
+
+	setLinkXoYoFactor( f ) {
+
+		this.effects.active = true;
+		this.effects.doLinkXoYoChange = true;
+		this.effects.linkXoYoChange = f;
+
+	}
 
 	linkPos( parent, xoff, yoff ) {
 		this.linked = true;
@@ -951,6 +989,8 @@ class Sprite {
 		this.effects.rotate = 0;
 		this.effects.doRotate = false;
 		this.effects.rotateIncrease = 0;
+		this.effects.doLinkXoYoChange = false;
+		this.effects.linkXoYoChange = 1;
 
 	}
 
@@ -1375,6 +1415,16 @@ class SpriteMover {
 					if( s.effects.doAlpha ) {
 						s.effects.alpha = s.effects.alpha * s.effects.alphaFactor;
 						if( s.effects.alpha < 0.01 || s.effects.alpha > 1 ) {
+							s.deactivate();
+						}
+					}
+					if( s.effects.doLinkXoYoChange ) {
+
+						var f=s.effects.linkXoYoChange;
+						s.linkOffsetX *= f;
+						s.linkOffsetY *= f;
+
+						if( s.linkOffsetX < 0.01 && s.linkOffsetY < 0.01 ) {
 							s.deactivate();
 						}
 					}
