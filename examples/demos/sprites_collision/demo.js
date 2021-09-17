@@ -4,17 +4,20 @@ class Demo {
   initPlayBook(properties) {
 
 
-    /* this defines the resolution of the collision box, in pixels */
+    /* this defines the resolutions of the collision box, in pixels */
     /* lower value mean, higher granularity, the maximum granularity is '1' */
+    /* Then we pass these on to the loader */
     /* IMPORTANT: lower value means also more processing, and slower collision detection */
 
-    this.collisionResolution = {
-      xGranularity: 8,
-      yGranularity: 8
-    };
+    this.collisionResolution = { xGranularity: 8,
+    						               yGranularity: 16 };
 
+    this.collisionResolutionHiRes = { xGranularity: 2,
+    						                      yGranularity: 4 };
 
-    this.loader = new DemoLoader(this, this.collisionResolution);
+    this.loader = new DemoLoader( this,
+        this.collisionResolution,
+        this.collisionResolutionHiRes );
 
     this.width = properties.w;
     this.height = properties.h;
@@ -55,6 +58,7 @@ class Demo {
       /* use images for sprites */
       var img = this.res_sprite;
       var img2 = this.res_ball;
+      var img3 = this.res_ballhires;
 
       /* Add simple sprite */
       var sprite = new Sprite(img,  this.width * .6, this.height / 2);
@@ -77,7 +81,7 @@ class Demo {
       sprite.setType("sprite1");
       sprite.setColliding(true);
 
-      /* second sprite */
+      /**************** second sprite */
       var sprite2 = new Sprite(img2,  this.width * .4, this.height / 2);
       sprite2.activate();
 
@@ -97,10 +101,30 @@ class Demo {
       sprite2.setType("sprite2");
       sprite2.setColliding(true);
 
-      /* add sprites to sprite system */
+      /**************** third sprite */
+      var sprite3 = new Sprite(img3,  this.width * .4, this.height / 3);
+      sprite3.activate();
+
+      /* set direction, for movement */
+      sprite3.setDXDY(.3, -.3);
+
+      /* set boundary, and wrap in boundary */
+      sprite3.setBoundary(this.width *.25, this.height *.25,
+            this.width *.75, this.height *.75 );
+      sprite3.setBoundaryActionWrap();
+
+      /* add some data to the sprite */
+      sprite3.setData({
+        description: "this is my 3rd sprite"
+      });
+
+      sprite3.setType("sprite3");
+      sprite3.setColliding(true);
+
+      /**************** add sprites to sprite system */
       this.sprites.addSprite(sprite);
       this.sprites.addSprite(sprite2);
-
+      this.sprites.addSprite(sprite3);
       this.collissionCount = 0;
     }
   }
@@ -149,18 +173,18 @@ class Demo {
 
     context.font = '12px arial';
     context.textBaseline  = 'top';
-    context.fillStyle = 'rgba(0,0,0,1)';
+    context.fillStyle = 'rgba(255,255,255,1)';
     context.fillText( "Collision Count: " + this.collideCount + "   ",
-          0,
-          0
+          10,
+          10
         );
     context.fillText( "Check console for debug information ",
-          0,
-          16
+          10,
+          10+16
         );
     context.fillText( "Press space for showing colision boxes",
-          0,
-          32
+          10,
+          10+32
         );
 
 

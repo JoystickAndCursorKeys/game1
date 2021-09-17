@@ -1,13 +1,11 @@
 class DemoLoader {
 
-  constructor ( demo, collisionBoxResolution ) {
+  constructor ( demo, colRes, colResHires  ) {
     this.main = demo;
     this.data = [];
 
-
-    this.collisBoxRes = collisionBoxResolution;
-    
-
+    this.collisBoxRes = colRes;
+    this.collisBoxResHiRes = colResHires;
   }
 
 
@@ -25,6 +23,10 @@ class DemoLoader {
     id = 'res_ball';
     pictureURLs[ id ] = 'ball.png';
     this.data[ id ] = { type: 'img',  bg: null };
+
+    id = 'res_ballhires';
+    pictureURLs[ id ] = 'ball.png';
+    this.data[ id ] = { type: 'imghires',  bg: null };
 
     return {  imgSrcArray: pictureURLs, audioSrcArray: audioURLs } ;
 
@@ -55,6 +57,11 @@ class DemoLoader {
 
           this.main[id]   = new SpriteImage( pic , rd.bg,
               this.collisBoxRes );
+        }
+        else if( rd.type == 'imghires' ) {
+
+          this.main[id]   = new SpriteImage( pic , rd.bg,
+              this.collisBoxResHiRes );
         }
         else if( rd.type == 'font' ) {
 
