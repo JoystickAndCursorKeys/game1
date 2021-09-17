@@ -4,17 +4,10 @@ DISTR=`pwd`
 cd $WORK
 
 rm $DISTR/game1-core.zip
-zip $DISTR/game1-core.zip ./core/*
+zip $DISTR/game1-core.zip ./core/* 
+(cd doc; zip $DISTR/game1-core.zip ./README.txt)
 
 rm $DISTR/game1-examples.zip
 zip $DISTR/game1-examples.zip ./core/*
 zip $DISTR/game1-examples.zip `find ./examples`
-
-#mkdir temporary
-#cd temporary
-#cp ../index.html examples.html
-#pwd
-#ls
-#zip $DISTR/game1-examples.zip examples.html
-#cd ..
-#rm -Rf temporary
+(cd doc; zip $DISTR/game1-examples.zip ./README.txt)
