@@ -109,4 +109,50 @@ class SpriteImageMagic {
 			dstCtx.putImageData( imgdata2, 0, 0);
 	}
 
+
+	colorize( 	srcCtx,
+							dstCtx,
+							rec ) {
+
+      var f = 1-rec.effect;
+      var nR = rec.r;
+      var nG = rec.g;
+      var nB = rec.b;
+
+			var w = srcCtx.canvas.width;
+			var h = srcCtx.canvas.height;
+
+			var imgdata = srcCtx.getImageData(0, 0, w, h);
+			var dd  = imgdata.data;
+
+			var rowoffset = w * 4;
+
+			var xoffset = 0;
+			var yoffset = 0;
+			var offset;
+
+			for (var y = 0; y < h; y++) {
+				yoffset = y * rowoffset;
+				xoffset = 0;
+				for (var x = 0; x < w; x++) {
+					offset = yoffset + xoffset;
+
+					dd[ offset + 0] = dd[ offset + 0] * f +
+              (nR * (1-f));
+
+          dd[ offset + 1] = dd[ offset + 1] * f +
+              (nG * (1-f));
+
+          dd[ offset + 2] = dd[ offset + 2] * f +
+              (nB * (1-f));
+
+          xoffset += 4;
+					}
+					yoffset += rowoffset;
+
+			}
+
+			dstCtx.putImageData( imgdata, 0, 0);
+	}
+
 }

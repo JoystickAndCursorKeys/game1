@@ -624,6 +624,8 @@ class SpriteImage {
 							this.xoff = - w / 2;
 					    this.yoff = - h / 2;
 
+							this.w = w;
+							this.h = h;
 					}
 
 					//this.context.putImageData( imgdata, 0, 0);
@@ -828,7 +830,6 @@ class Sprite {
 		//context.globalCompositeOperation = "source-over";
   }
 
-
   activate() {
     this.active = true;
   }
@@ -836,6 +837,80 @@ class Sprite {
 	deactivate() {
     this.active = false;
   }
+
+	getLayerInfo() {
+		if( this.parent.layerManager === undefined ) {
+			throw "Sprite.getLayerInfo() needs to be in a SpriteMover that needs to have a SpriteLayers parent";
+		}
+
+		return {
+			layer: this.parent.layerId,
+			count: this.parent.layerManager.getLayerCount()
+		}
+
+	}
+
+
+
+	moreToFront() {
+		var p = this.parent;
+		var mgr = p.layerManager;
+
+		if( mgr === undefined ) {
+			throw "Sprite.moreToFront() needs to be in a SpriteMover that needs to have a SpriteLayers parent";
+		}
+
+		var c = mgr.getLayerCount();
+
+		var dest = p.layerId + 1;
+		if( dest >= c ) {
+			throw "Sprite.moreToFront(), sprite cannot move to front when allready in front";
+		}
+
+		p.removeSprite( this );
+		var p2 = mgr.getLayer( dest );
+		p2.addSprite( this );
+
+	}
+
+	moreToBack() {
+		var p = this.parent;
+		var mgr = p.layerManager;
+
+		if( mgr === undefined ) {
+			throw "Sprite.moreToBack() needs to be in a SpriteMover that needs to have a SpriteLayers parent";
+		}
+
+		var c = mgr.getLayerCount();
+
+		var dest = p.layerId -1;
+		if( dest < 0 ) {
+			throw "Sprite.moreToBack(), sprite cannot move to back when allready in back";
+		}
+
+		p.removeSprite( this );
+		var p2 = mgr.getLayer( dest );
+		p2.addSprite( this );
+	}
+
+	toLayer( dest ) {
+		var p = this.parent;
+		var mgr = p.layerManager;
+
+		if( mgr === undefined ) {
+			throw "Sprite.moreToFront() needs to be in a SpriteMover that needs to have a SpriteLayers parent";
+		}
+
+		var c = mgr.getLayerCount();
+
+		p.removeSprite( this );
+		var p2 = mgr.getLayer( dest );
+		p2.addSprite( this );
+	}
+
+	getWH() {
+		return [this.spriteImage.w, this.spriteImage.h];
+	}
 
 	cycleFrame() {
 		if( !this.pauseAnimFlag ) {
@@ -899,10 +974,6 @@ class Sprite {
 		this.linkOffsetY = yoff;
 	}
 
-	setLinkXoYo( xoff, yoff ) {
-		this.linkOffsetX = xoff;
-		this.linkOffsetY = yoff;
-	}
 
 	getLinkXoYo() {
 		return [this.linkOffsetX, this.linkOffsetY];
@@ -958,11 +1029,24 @@ class Sprite {
 
 	}
 
+
+	adjustFadeFactor( alphaFactor ) {
+
+		this.effects.alphaFactor = scaleFactor;
+
+	}
+
 	setScaleFactor( scaleFactor ) {
 
 		this.effects.active = true;
 		this.effects.scale = 1;
 		this.effects.doScale = true;
+		this.effects.scaleFactor = scaleFactor;
+
+	}
+
+	adjustScaleFactor( scaleFactor ) {
+
 		this.effects.scaleFactor = scaleFactor;
 
 	}
@@ -976,6 +1060,10 @@ class Sprite {
 
 	}
 
+
+	adjustRotateIncrease( rotateIncrease ) {
+		this.effects.rotateIncrease = rotateIncrease;
+	}
 
 	resetEffects() {
 
@@ -1248,12 +1336,71 @@ class Sprite {
 
 }
 
+class SpriteLayers {
+
+	constructor( x ) {
+		this.movers = [];
+		if( x === undefined ) {
+				return;
+		}
+		else {
+			for( var i=0; i<x; i++ ) {
+				this.movers.push( new SpriteMover() );
+
+				this.movers[ this.movers.length-1 ].layerId = i;
+				this.movers[ this.movers.length-1 ].layerManager = this;
+			}
+		}
+	}
+
+  addSprite( s, l ) {
+		this.movers[ l ].addSprite(s);
+	}
+
+	getLayer( x ) {
+		return this.movers[ x ];
+	}
+
+	getLayerCount() {
+		return this.movers.length;
+	}
+
+	addLayer( l ) {
+		var i = this.movers.length;
+
+		this.movers.push(l);
+		this.movers[ this.movers.length-1 ].layerId = i;
+		this.movers[ this.movers.length-1 ].layerManager = this;
+	}
+
+	render( ctx ) {
+		for( var i=0; i<this.movers.length; i++ ) {
+			var m = this.movers[ i ];
+			m.render( ctx );
+		}
+	}
+
+	move( ) {
+		for( var i=0; i<this.movers.length; i++ ) {
+			var m = this.movers[ i ];
+			m.move( );
+		}
+	}
+
+	animate( ) {
+		for( var i=0; i<this.movers.length; i++ ) {
+			var m = this.movers[ i ];
+			m.animate( );
+		}
+	}
+
+}
 
 class SpriteMover {
   constructor() {
       this.sprites = [];
+			this.idCount = 0;
   }
-
 
 	countSprites( type ) {
 		var count = 0;
@@ -1297,6 +1444,8 @@ class SpriteMover {
   addSprite( s ) {
     if( this.sprites.length < 100 ) {
       this.sprites.push( s );
+			s.uid = this.idCount++;
+
     }
     else {
       var found = -1;
@@ -1309,15 +1458,20 @@ class SpriteMover {
 
       if( found == -1 ) {
         this.sprites.push( s );
+				s.uid = this.idCount++;
+
 				console.log("sprite count: " + this.sprites.length );
       }
       else {
         this.sprites[ found ] = s;
       }
     }
+
+		s.parent = this;
   }
 
-  removeSprite( s ) {
+
+  sliceSprite( s ) {
     var index = this.sprites.find( s );
     if( index > -1 ) {
       this.sprites.splice(index, 1);
@@ -1326,9 +1480,34 @@ class SpriteMover {
       console.error("sprite with issue:");
       console.error( s );
       console.error( "spritearraylen = " + this.sprites.length );
-      throw "(SpriteMover) could not find index for sprite, during removeSprite";
+      throw "(SpriteMover) could not find index for sprite, during sliceSprite";
     }
   }
+
+
+	removeSprite( s ) {
+
+		var check = null;
+		var found = -1;
+
+		for( var i=0; i<this.sprites.length; i++) {
+				check = this.sprites[i];
+				if( check.uid == s.uid ) {
+					found = i;
+					break;
+				}
+		}
+
+		if( found > -1) {
+			this.sprites[ i ] = { active: false }
+		}
+		else {
+			console.error("sprite could not be removed: " + s.uid);
+			console.error( s );
+			console.error( "spritearraylen = " + this.sprites.length );
+			throw "(SpriteMover) could not find index for sprite, during removeSprite";
+		}
+	}
 
 
   detectColissions() {
