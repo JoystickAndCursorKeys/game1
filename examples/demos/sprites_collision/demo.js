@@ -19,6 +19,7 @@ class Demo {
     this.width = properties.w;
     this.height = properties.h;
 
+    this.collideCount = 0;
 
   }
 
@@ -56,14 +57,16 @@ class Demo {
       var img2 = this.res_ball;
 
       /* Add simple sprite */
-      var sprite = new Sprite(img, 0, this.height / 2);
+      var sprite = new Sprite(img,  this.width * .6, this.height / 2);
       sprite.activate();
 
       /* set direction, for movement */
-      sprite.setDXDY(2, 3);
+      sprite.setDXDY(-.3, 0);
 
       /* set boundary, and wrap in boundary */
-      sprite.setBoundary(-img.w, -img.h, this.width + img.w, this.height + img.h);
+      sprite.setBoundary(this.width *.25, this.height *.25,
+            this.width *.75, this.height *.75 );
+
       sprite.setBoundaryActionWrap();
 
       /* add some data to the sprite */
@@ -75,14 +78,15 @@ class Demo {
       sprite.setColliding(true);
 
       /* second sprite */
-      var sprite2 = new Sprite(img2, 0, this.height / 2);
+      var sprite2 = new Sprite(img2,  this.width * .4, this.height / 2);
       sprite2.activate();
 
       /* set direction, for movement */
-      sprite2.setDXDY(2, -3);
+      sprite2.setDXDY(.3, 0);
 
       /* set boundary, and wrap in boundary */
-      sprite2.setBoundary(-img2.w, -img2.h, this.width + img2.w, this.height + img2.h);
+      sprite2.setBoundary(this.width *.25, this.height *.25,
+            this.width *.75, this.height *.75 );
       sprite2.setBoundaryActionWrap();
 
       /* add some data to the sprite */
@@ -101,7 +105,17 @@ class Demo {
     }
   }
 
-  playHandle() {}
+  playHandle( evt ) {
+
+    console.log( event );
+    if( evt.keyCode == 32 && evt.type==='keydown' ) {
+        CollisionBoxFactory_Debug_a260592cbef84c018c6f3f4eff1037a0 = !
+          CollisionBoxFactory_Debug_a260592cbef84c018c6f3f4eff1037a0;
+    }
+
+  }
+
+
 
 
   playRun() {
@@ -109,11 +123,13 @@ class Demo {
     this.sprites.move();
     this.sprites.animate();
     var c = this.sprites.detectColissions();
-
+    this.collideCount = 0;
     if (c.length > 0) {
+      this.collideCount = c.length;
 
       this.collissionCount++;
       console.log('collision ' + this.collissionCount );
+      console.log('collide array length' + c.length + ", see below for the collision array dump");
       console.log('collide array length' + c.length + ", see below for the collision array dump");
       console.log(c);
     }
@@ -130,6 +146,25 @@ class Demo {
       this.width,
       this.height
     );
+
+    context.font = '12px arial';
+    context.textBaseline  = 'top';
+    context.fillStyle = 'rgba(0,0,0,1)';
+    context.fillText( "Collision Count: " + this.collideCount + "   ",
+          0,
+          0
+        );
+    context.fillText( "Check console for debug information ",
+          0,
+          16
+        );
+    context.fillText( "Press space for showing colision boxes",
+          0,
+          32
+        );
+
+
+
     this.sprites.render(context);
   }
 

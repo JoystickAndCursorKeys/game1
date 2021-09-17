@@ -515,9 +515,6 @@ class GameState {
 
   handleEvent( evt ) {
 
-    //console.log( "handleEvent" );
-    //console.log( evt );
-
       var myClass = this.stateClass;
       try {
         if( this.methodEvents != undefined ) {
