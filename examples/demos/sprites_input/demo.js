@@ -53,7 +53,7 @@ class Demo {
     sprite.activate();
 
     /* set boundary, and wrap in boundary */
-    sprite.setBoundary( -img.w, -img.h, this.width + img.w, this.height + img.h );
+    sprite.setBoundary( -img.w/2, -img.h/2, this.width + img.w/2, this.height + img.h/2 );
     sprite.setBoundaryActionWrap();
 
     /* add some data to the sprite */
@@ -127,6 +127,13 @@ class Demo {
     context.fillText( "use cursor keys to move the sprite around",
           0,
           0
+        );
+
+    var xy = this.sprite.getXY();
+    var wh = this.sprite.getWH();
+    context.fillText( "x=" + xy[0] + " y="+ xy[1]  + "   w="+wh[0]+" ",
+          0,
+          16
         );
 	}
 

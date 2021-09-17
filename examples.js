@@ -41,6 +41,11 @@ examples.push({
 });
 
 examples.push({
+  name: "Sprites Layer Demo",
+  path: "examples/demos/sprites_layers"
+});
+
+examples.push({
   name: "Input Controlled Sprites Demo",
   path: "examples/demos/sprites_input"
 });
