@@ -685,8 +685,6 @@ class Boot {
           _SCRH
         );
 
-
-
         if( Array.isArray( stateDefinitions ) ) {
             var errorString = "new Boot( ..., ..., ..., stateDefinitions ), stateDefinitions must be either and object or an array of [ runClassObject, 'basic' ]";
             if( stateDefinitions.length != 2 ) {
