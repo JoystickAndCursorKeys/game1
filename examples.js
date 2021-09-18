@@ -46,8 +46,8 @@ examples.push({
 });
 
 examples.push({
-  name: "Input Controlled Sprites Demo",
-  path: "examples/demos/sprites_input"
+  name: "Keyboard Input Controlled Sprites Demo",
+  path: "examples/demos/sprites_keyboardinput"
 });
 
 examples.push({
