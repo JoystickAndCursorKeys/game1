@@ -131,6 +131,7 @@ class C64Screen {
 			map['%'] = 37;
 			map['&'] = 38;
 			map['\''] = 39;
+			map['\\'] = 77;
 			map['('] = 40;
 			map[')'] = 41;
 
@@ -160,6 +161,15 @@ class C64Screen {
 			map['?'] = 63;
 
 			this.map = map;
+
+			var backmap = []
+			var mapInfo = Object.entries(map);
+			for( var i=0; i<mapInfo.length; i++) {
+				backmap[ mapInfo[i][1]] = mapInfo[i][0];
+			}
+			backmap[32] = " ";
+			this.backmap = backmap;
+			console.log( backmap );
 
 			this.sprites = [];
 
@@ -194,6 +204,13 @@ class C64Screen {
 			this.pixels8 = this.context.createImageData(8,1);
 			this.pixels8data = this.pixels8.data;
 
+			this.col = 14;
+			this.bgcol = 6;
+			this.bgcolLast = 6;
+			this.bcol = 14;
+			this.bcolLast = 14;
+
+
    }
 
 	 reset( ) {
@@ -218,7 +235,7 @@ class C64Screen {
 		 var rctx = this.context;
 		 var rcvs = this.canvas;
 
-		 this.borderDirty = true;
+		 this.bcolLast = -1;
 
 		 this.clearScreen();
 		 this.writeString( "ready.", true );
@@ -234,6 +251,18 @@ class C64Screen {
      }
    }
 
+
+	 setColor( c ) {
+		 this.col = c;
+	 }
+
+	 setBGColor( c ) {
+		 this.bgcol = c;
+	 }
+
+	 setBorderColor( c ) {
+		 this.bcol = c;
+	 }
 
  	 spriteFrame( s, f ) {
 
@@ -356,49 +385,6 @@ class C64Screen {
 	 	}
 	 }
 
-	 _renderBackGround() {
-		 var ctx = this.context;
-		 var cvs = this.canvas;
-
-		 ctx.fillStyle = this._htmlColor( this.colors[ 6 ] );
-		 ctx.fillRect(
-			 0,0,
-			 cvs.width,
-			 cvs.height
-		 );
-	 }
-
-	 _renderBuffer() {
-		 var buf = this.buffer;
-		 var ctx = this.context;
-		 var bufctx = this.bufcontext;
-
-		 ctx.fillStyle = this._htmlColor( this.colors[ 6 ] );
-
-		 for( var y=0; y<25; y++) {
-		 	for( var x=0; x<40; x++) {
-				if( buf[y][x][2] ) {
-						buf[y][x][2] = false;
-						ctx.fillRect(
-			 			 x*8, y*8,
-			 			 8,8
-			 		 );
-					 this.renderChar(x*8, y*8, buf[y][x][0], buf[y][x][1] );
-				}
-		 	}
-		 }
-
-		 bufctx.drawImage( this.canvas, 0, 0);
-
-		 for( var i = 0; i < this.sprites.length; i++ ) {
-			 var sp = this.sprites[ i ];
-				 if( sp.enabled ) {
-
-					//console.log( "Draw sprite " + i);
-				 	bufctx.drawImage( sp.canvas, sp.x-24, sp.y-21 );
-			 }
-		 }
-	 }
 
 	 scrollUp() {
 		 console.log("Scrolling not yet implemented");
@@ -425,6 +411,7 @@ class C64Screen {
 
 	 }
 
+
 	 nextLine(  c ) {
 		 this.cursory++;
 		 this.cursorx=0;
@@ -439,6 +426,7 @@ class C64Screen {
 		var buf = this.buffer;
  		if( index > -1 ) {
 			buf[this.cursory][this.cursorx][2] = true;
+			buf[this.cursory][this.cursorx][1] = this.col;
 			buf[this.cursory][this.cursorx][0] = index;
  		}
 		this.cursorx++;
@@ -449,8 +437,66 @@ class C64Screen {
 		}
    }
 
+
+	 deleteChar() {
+    var index = 32;
+		var buf = this.buffer;
+
+		this.cursorx--;
+		if(this.cursorx <0 ) {
+			this.cursorx = 39;
+
+			this.cursory--;
+			if(this.cursory <0 ) {
+				this.cursory = 0;
+				this.cursorx = 0;
+			}
+
+		}
+
+		buf[this.cursory][this.cursorx][2] = true;
+		buf[this.cursory][this.cursorx][0] = index;
+
+   }
+
+
+	 getCurrentLine() {
+		 var line;
+		 var buf = this.buffer;
+
+		 line = "";
+
+		 for( var x=0; x<39; x++) {
+			 var c=this.backmap[ buf[this.cursory][x][0] ];
+			 if( !c ) { c=" "};
+			 line = line + c;
+		 }
+		 return line;
+	 }
+
+
 	 blinkCursor() {
 		var buf = this.buffer;
+		if( !this.cursorOn ) {
+			this.cursorOn = true;
+			var index = 32+128;
+			buf[this.cursory][this.cursorx][2] = true;
+			buf[this.cursory][this.cursorx][1] = this.col;
+			buf[this.cursory][this.cursorx][0] = index;
+		}
+		else {
+			this.cursorOn = false;
+			var index = 32;
+			buf[this.cursory][this.cursorx][2] = true;
+			buf[this.cursory][this.cursorx][1] = this.col;
+			buf[this.cursory][this.cursorx][0] = index;
+		}
+
+   }
+
+	 clearCursor() {
+		var buf = this.buffer;
+		this.cursorOn = true;
 		if( !this.cursorOn ) {
 			this.cursorOn = true;
 			var index = 32+128;
@@ -465,6 +511,7 @@ class C64Screen {
 		}
 
    }
+
 
 	 writeString( str, newLine ) {
 		 for (var i = 0; i < str.length; i++) {
@@ -505,8 +552,7 @@ class C64Screen {
 
 	 renderDisplay( ) {
 
-		 if( this.borderDirty ) {
-			 this.borderDirty = false;
+		 if( this.bcolLast != this.bcol ) {
 
 			 this._updateBorder();
 		 }
@@ -520,7 +566,7 @@ class C64Screen {
 		 var dw = this.FULLWIDTH;
  		 var dh = this.FULLHEIGHT;
 		 var dCtx = this.rcontext;
-		 dCtx.fillStyle = this._htmlColor( this.colors[ 14 ] );
+		 dCtx.fillStyle = this._htmlColor( this.colors[ this.bcol ] );
 		 dCtx.fillRect(
 			 0,0,
 			 dw,
@@ -541,6 +587,67 @@ class C64Screen {
 
 		dCtx.drawImage( sCvs, b.w, b.h, dw, dh);
 	 }
+
+	 _renderBackGround() {
+		 var ctx = this.context;
+		 var cvs = this.canvas;
+
+		 ctx.fillStyle = this._htmlColor( this.colors[ this.bgcol ] );
+		 ctx.fillRect(
+			 0,0,
+			 cvs.width,
+			 cvs.height
+		 );
+	 }
+
+	 _renderBuffer() {
+		 var buf = this.buffer;
+		 var ctx = this.context;
+		 var bufctx = this.bufcontext;
+
+		 ctx.fillStyle = this._htmlColor( this.colors[ this.bgcol ] );
+
+		 if( this.bgcolLast != this.bgcol ) {
+			 for( var y=0; y<25; y++) {
+			 	for( var x=0; x<40; x++) {
+
+							buf[y][x][2] = false;
+							ctx.fillRect(
+				 			 x*8, y*8,
+				 			 8,8
+				 		 );
+						 this.renderChar(x*8, y*8, buf[y][x][0], buf[y][x][1] );
+
+			 	}
+			 }
+			 this.bgcolLast = this.bgcol;
+		 }
+		 else {
+			 for( var y=0; y<25; y++) {
+			 	for( var x=0; x<40; x++) {
+					if( buf[y][x][2] ) {
+							buf[y][x][2] = false;
+							ctx.fillRect(
+				 			 x*8, y*8,
+				 			 8,8
+				 		 );
+						 this.renderChar(x*8, y*8, buf[y][x][0], buf[y][x][1] );
+					}
+			 	}
+			 }
+		 }
+		 bufctx.drawImage( this.canvas, 0, 0);
+
+		 for( var i = 0; i < this.sprites.length; i++ ) {
+			 var sp = this.sprites[ i ];
+				 if( sp.enabled ) {
+
+					//console.log( "Draw sprite " + i);
+				 	bufctx.drawImage( sp.canvas, sp.x-24, sp.y-21 );
+			 }
+		 }
+	 }
+
 
 
    _prepColor( img, col ) {
