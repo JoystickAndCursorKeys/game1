@@ -84,8 +84,3 @@ examples.push({
   name: "Asteroids Game",
   path: "examples/games/asteroids"
 });
-
-examples.push({
-  name: "BoulderBash Game",
-  path: "examples/games/boulderbash"
-});
