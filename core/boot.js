@@ -1,5 +1,15 @@
 const NOSTATECHANGE = 99999;
 
+var gameRenderFrameFunctionRec = {}
+
+function gameRenderFrameFunction(  )
+{
+  var r = gameRenderFrameFunctionRec;
+
+  r._this.renderFrame( r.ctx, r.exceptionHandler );
+}
+
+
 class GameState {
 
 
@@ -217,7 +227,7 @@ class GameState {
       }
 
       this.loadResources( data.urls );
-      return;
+      //return;
     }
 
     if( this.state.__typedef.INI == true ) {
@@ -528,6 +538,7 @@ class GameState {
         err.exception = except;
         err.myClass = myClass;
 
+        console.log( except );
         throw err;
       }
 
@@ -557,7 +568,15 @@ class GameState {
     }
 
     if( this.exception == false ) {
-      requestAnimationFrame(() => { this.renderFrame( ctx, exceptionHandler ) } );
+
+      gameRenderFrameFunctionRec = {
+        _this: this,
+        ctx: ctx,
+        exceptionHandler: exceptionHandler
+      };
+
+
+      requestAnimationFrame( gameRenderFrameFunction );
     }
 
   }
@@ -685,8 +704,6 @@ class Boot {
           _SCRH
         );
 
-
-
         if( Array.isArray( stateDefinitions ) ) {
             var errorString = "new Boot( ..., ..., ..., stateDefinitions ), stateDefinitions must be either and object or an array of [ runClassObject, 'basic' ]";
             if( stateDefinitions.length != 2 ) {
@@ -708,7 +725,7 @@ class Boot {
         var __this = this;
 
         try {
-          requestAnimationFrame(() => { this.state.renderFrame( this.renderContext, this ) } );
+          this.state.renderFrame( this.renderContext, this );
         }
         catch( except ) {
           console.log( "RENDER ERROR");
@@ -767,6 +784,7 @@ class Boot {
     var text2 = 'From ('+parts[0]+')';
 
     console.error( consoletext );
+    console.error( obj.exception );
     if( obj.exception.stack != undefined ) {
       console.log( obj.exception.stack );
       console.log( obj.myClass);
